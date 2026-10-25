@@ -38,7 +38,7 @@ function Reports() {
   for (const s of stays) {
     const c = calcStay(s);
     const t = typeOf[s.room_no];
-    if (t) byType[t] += c.room_revenue;
+    if (t) byType[t] = (byType[t] ?? 0) + c.room_revenue;
     byPay[s.payment_method] = (byPay[s.payment_method] ?? 0) + Number(s.amount_paid);
     laundry += Number(s.laundry_cost);
   }
