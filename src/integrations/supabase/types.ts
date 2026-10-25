@@ -14,7 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      rooms: {
+        Row: {
+          created_at: string
+          floor: number
+          id: string
+          room_no: string
+          room_type: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          floor?: number
+          id?: string
+          room_no: string
+          room_type?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          floor?: number
+          id?: string
+          room_no?: string
+          room_type?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      stays: {
+        Row: {
+          amount_paid: number
+          check_in: string
+          check_out: string
+          created_at: string
+          guest_name: string
+          id: string
+          laundry_cost: number
+          payment_method: string
+          rate_per_night: number
+          room_no: string
+        }
+        Insert: {
+          amount_paid?: number
+          check_in: string
+          check_out: string
+          created_at?: string
+          guest_name: string
+          id?: string
+          laundry_cost?: number
+          payment_method?: string
+          rate_per_night?: number
+          room_no: string
+        }
+        Update: {
+          amount_paid?: number
+          check_in?: string
+          check_out?: string
+          created_at?: string
+          guest_name?: string
+          id?: string
+          laundry_cost?: number
+          payment_method?: string
+          rate_per_night?: number
+          room_no?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
