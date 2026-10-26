@@ -71,3 +71,35 @@ export const staysQuery = queryOptions({
     return data as Stay[];
   },
 });
+
+export type AppRole = "admin" | "staff";
+
+export type Profile = { id: string; email: string | null; created_at: string };
+
+export const myRolesQuery = (userId: string) =>
+  queryOptions({
+    queryKey: ["my-roles", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+      if (error) throw error;
+      return (data ?? []).map((r) => r.role as AppRole);
+    },
+  });
+
+export const profilesQuery = queryOptions({
+  queryKey: ["profiles"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("profiles").select("*").order("created_at");
+    if (error) throw error;
+    return data as Profile[];
+  },
+});
+
+export const allRolesQuery = queryOptions({
+  queryKey: ["all-roles"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("user_roles").select("*");
+    if (error) throw error;
+    return data as { id: string; user_id: string; role: AppRole }[];
+  },
+});
