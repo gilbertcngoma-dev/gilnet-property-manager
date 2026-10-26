@@ -1,0 +1,19 @@
+CHANICHE LODGE - WINDOWS COPY 1.0.1
+
+1. Right-click the ZIP download and select Extract All.
+2. Open the extracted Chaniche Lodge folder.
+3. Double-click Open Chaniche Lodge.cmd.
+4. Keep all the files together. Do not move just the EXE to the desktop.
+
+This copy requires Windows 10 or newer on a 64-bit Intel or AMD computer,
+and an internet connection. It uses the same lodge account and records.
+
+If it still does not open, send the Chaniche-startup.log file from this
+folder, or a photo of the Windows message. Additional startup details may
+be in %APPDATA%\Chaniche Lodge\startup.log.
+
+The program is not digitally signed. If Windows blocks it, do not disable
+your antivirus. Use the website instead while the warning is investigated:
+https://lodgeflow-stay-and-revenue.lovable.app/
+
+The Windows launch has not been tested on a Windows computer here.

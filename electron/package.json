@@ -1,0 +1,6 @@
+{
+  "name": "chaniche-lodge",
+  "version": "1.0.1",
+  "private": true,
+  "main": "main.cjs"
+}
