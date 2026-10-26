@@ -16,6 +16,7 @@ import { Route as AuthenticatedFrontDeskRouteImport } from './routes/_authentica
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRestaurantRouteImport } from './routes/_authenticated/restaurant'
 import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated/rooms'
+import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/staff'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -51,6 +52,11 @@ const AuthenticatedRoomsRoute = AuthenticatedRoomsRouteImport.update({
   path: '/rooms',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStaffRoute = AuthenticatedStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/restaurant': typeof AuthenticatedRestaurantRoute
   '/rooms': typeof AuthenticatedRoomsRoute
+  '/staff': typeof AuthenticatedStaffRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/restaurant': typeof AuthenticatedRestaurantRoute
   '/rooms': typeof AuthenticatedRoomsRoute
+  '/staff': typeof AuthenticatedStaffRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
@@ -76,14 +84,28 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/restaurant': typeof AuthenticatedRestaurantRoute
   '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
+  '/_authenticated/staff': typeof AuthenticatedStaffRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/front-desk' | '/reports' | '/restaurant' | '/rooms'
+    | '/'
+    | '/auth'
+    | '/front-desk'
+    | '/reports'
+    | '/restaurant'
+    | '/rooms'
+    | '/staff'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth' | '/front-desk' | '/reports' | '/restaurant' | '/rooms' | '/'
+  to:
+    | '/auth'
+    | '/front-desk'
+    | '/reports'
+    | '/restaurant'
+    | '/rooms'
+    | '/staff'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
@@ -92,6 +114,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/restaurant'
     | '/_authenticated/rooms'
+    | '/_authenticated/staff'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -151,6 +174,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRoomsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/staff': {
+      id: '/_authenticated/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof AuthenticatedStaffRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -159,6 +189,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRestaurantRoute: typeof AuthenticatedRestaurantRoute
   AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
+  AuthenticatedStaffRoute: typeof AuthenticatedStaffRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
@@ -167,6 +198,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRestaurantRoute: AuthenticatedRestaurantRoute,
   AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
+  AuthenticatedStaffRoute: AuthenticatedStaffRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
