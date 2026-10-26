@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      restaurant_sales: {
+        Row: {
+          created_at: string
+          id: string
+          item: string
+          payment_method: string
+          quantity: number
+          room_no: string | null
+          sale_date: string
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item: string
+          payment_method?: string
+          quantity?: number
+          room_no?: string | null
+          sale_date?: string
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item?: string
+          payment_method?: string
+          quantity?: number
+          room_no?: string | null
+          sale_date?: string
+          unit_price?: number
+        }
+        Relationships: []
+      }
       rooms: {
         Row: {
           created_at: string

@@ -8,6 +8,13 @@
       "when": 1792931592004,
       "tag": "0000_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793031348126,
+      "tag": "0001_create_restaurant_sales",
+      "breakpoints": true
     }
   ]
 }
