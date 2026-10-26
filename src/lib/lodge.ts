@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 export type Room = {
   id: string;
   room_no: string;
-  room_type: "Standard" | "Deluxe" | "Suite";
+  room_type: "Standard" | "Twin" | "Deluxe" | "Suite";
   status: "Vacant" | "Occupied" | "Cleaning";
   floor: number;
 };
