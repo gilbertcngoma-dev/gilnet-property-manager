@@ -60,7 +60,7 @@ function Rooms() {
       </div>
       <form onSubmit={add} className="card flex flex-wrap items-end gap-3">
         <div><label className="label">Room no</label><input className="field" value={n.room_no} onChange={(e) => setN({ ...n, room_no: e.target.value })} /></div>
-        <div><label className="label">Type</label><select className="field" value={n.room_type} onChange={(e) => setN({ ...n, room_type: e.target.value })}><option>Standard</option><option>Deluxe</option><option>Suite</option></select></div>
+        <div><label className="label">Type</label><select className="field" value={n.room_type} onChange={(e) => setN({ ...n, room_type: e.target.value })}><option>Standard</option><option>Twin</option><option>Deluxe</option><option>Suite</option></select></div>
         <div><label className="label">Floor</label><input type="number" className="field w-20" value={n.floor} onChange={(e) => setN({ ...n, floor: Number(e.target.value) })} /></div>
         <button className="btn">Add room</button>
       </form>
