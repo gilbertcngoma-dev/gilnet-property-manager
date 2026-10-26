@@ -15,6 +15,13 @@
       "when": 1793031348126,
       "tag": "0001_create_restaurant_sales",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793031870898,
+      "tag": "0002_allow_twin_room_type",
+      "breakpoints": true
     }
   ]
 }
