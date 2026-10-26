@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { roomsQuery, staysQuery, todayISO, calcStay, kwacha, canExtendStay, currentStayForRoom, type Room, type Stay } from "@/lib/lodge";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/rooms")({
+export const Route = createFileRoute("/_authenticated/rooms")({
   head: () => ({
     meta: [
       { title: "Rooms — Lodge Manager" },
