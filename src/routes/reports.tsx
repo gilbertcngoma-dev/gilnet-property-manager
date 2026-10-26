@@ -33,7 +33,7 @@ function Reports() {
   const stays = useQuery(staysQuery).data ?? [];
   const typeOf = Object.fromEntries(rooms.map((r) => [r.room_no, r.room_type]));
   const byType: Record<string, number> = { Standard: 0, Deluxe: 0, Suite: 0 };
-  const byPay: Record<string, number> = { Cash: 0, Airtel: 0, Bank: 0 };
+  const byPay: Record<string, number> = { Cash: 0, Mobile: 0, "Visa/Card": 0, Compliment: 0 };
   let laundry = 0;
   for (const s of stays) {
     const c = calcStay(s);

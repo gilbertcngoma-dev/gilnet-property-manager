@@ -18,8 +18,10 @@ export type Stay = {
   rate_per_night: number;
   laundry_cost: number;
   amount_paid: number;
-  payment_method: "Cash" | "Airtel" | "Bank";
+  payment_method: "Cash" | "Mobile" | "Visa/Card" | "Compliment" | "Airtel" | "Bank";
 };
+
+export const PAYMENT_METHODS = ["Cash", "Mobile", "Visa/Card", "Compliment"] as const;
 
 export function nightsBetween(checkIn: string, checkOut: string) {
   if (!checkIn || !checkOut) return 0;
