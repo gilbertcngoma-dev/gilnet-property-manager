@@ -61,7 +61,7 @@ function Restaurant() {
         <div><label className="label">Qty</label><input type="number" min={1} className="field w-20" value={f.quantity} onChange={(e) => setF({ ...f, quantity: Number(e.target.value) })} /></div>
         <div><label className="label">Price (K)</label><input type="number" min={0} step="0.01" className="field w-28" value={f.unit_price} onChange={(e) => setF({ ...f, unit_price: Number(e.target.value) })} /></div>
         <div><label className="label">Room (optional)</label><input className="field w-24" value={f.room_no} onChange={(e) => setF({ ...f, room_no: e.target.value })} /></div>
-        <div><label className="label">Payment</label><select className="field" value={f.payment_method} onChange={(e) => setF({ ...f, payment_method: e.target.value })}><option>Cash</option><option>Airtel</option><option>Bank</option></select></div>
+        <div><label className="label">Payment</label><select className="field" value={f.payment_method} onChange={(e) => setF({ ...f, payment_method: e.target.value })}>{PAYMENT_METHODS.map((m) => <option key={m}>{m}</option>)}</select></div>
         <div className="text-sm font-semibold">Total: {kwacha(total(f))}</div>
         <button className="btn">Add sale</button>
       </form>

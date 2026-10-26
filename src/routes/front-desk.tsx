@@ -69,7 +69,7 @@ function FrontDesk() {
         </div>
         <div><label className="label">Payment method</label>
           <select className="field" value={f.payment_method} onChange={(e) => set("payment_method", e.target.value)}>
-            <option>Cash</option><option>Airtel</option><option>Bank</option>
+            {PAYMENT_METHODS.map((m) => <option key={m}>{m}</option>)}
           </select>
         </div>
         <div><label className="label">Check-in</label><input type="date" className="field" value={f.check_in} onChange={(e) => set("check_in", e.target.value)} /></div>
