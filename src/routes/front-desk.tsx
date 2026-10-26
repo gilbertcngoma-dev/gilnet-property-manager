@@ -94,7 +94,24 @@ function FrontDesk() {
       <div className="card overflow-x-auto">
         <h2 className="mb-3 text-lg font-semibold">Current guests</h2>
         {latestPerRoom.length === 0 ? <p className="text-sm text-muted-foreground">No guests in house.</p> : (
-          <table className="w-full text-sm">
+          <>
+          <div className="space-y-3 md:hidden">
+            {latestPerRoom.map((s) => { const k = calcStay(s); return (
+              <div key={s.id} className="space-y-2 rounded-lg border p-3 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{s.guest_name}</span>
+                  <span className="text-muted-foreground">Room {s.room_no}</span>
+                </div>
+                <div className="text-xs text-muted-foreground">{s.check_in} → {s.check_out} · {k.nights} night{k.nights === 1 ? "" : "s"}</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div><div className="label">Total</div><b>{kwacha(k.total_revenue)}</b></div>
+                  <div><div className="label">Paid (K)</div><input type="number" className="field w-full py-1" defaultValue={s.amount_paid} onBlur={(e) => Number(e.target.value) !== Number(s.amount_paid) && updatePaid(s, Number(e.target.value))} /></div>
+                  <div><div className="label">Balance</div><b className={k.balance > 0 ? "text-destructive" : ""}>{kwacha(k.balance)}</b></div>
+                </div>
+                <button type="button" className="btn-ghost" onClick={() => checkout(s)}>Check out</button>
+              </div>); })}
+          </div>
+          <table className="hidden w-full text-sm md:table">
             <thead><tr className="text-left text-xs uppercase text-muted-foreground"><th className="py-2">Guest</th><th>Room</th><th>Dates</th><th>Nights</th><th>Total</th><th>Paid</th><th>Balance</th><th></th></tr></thead>
             <tbody className="divide-y">
               {latestPerRoom.map((s) => { const k = calcStay(s); return (
