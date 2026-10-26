@@ -29,6 +29,13 @@
       "when": 1793032965659,
       "tag": "0003_room_service_and_pending_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793035675229,
+      "tag": "0004_staff_only_access",
+      "breakpoints": true
     }
   ]
 }

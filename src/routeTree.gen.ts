@@ -9,122 +9,128 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as FrontDeskRouteImport } from './routes/front-desk'
-import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as RestaurantRouteImport } from './routes/restaurant'
-import { Route as RoomsRouteImport } from './routes/rooms'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedFrontDeskRouteImport } from './routes/_authenticated/front-desk'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedRestaurantRouteImport } from './routes/_authenticated/restaurant'
+import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated/rooms'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/_authenticated/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FrontDeskRoute = FrontDeskRouteImport.update({
-  id: '/front-desk',
+const AuthenticatedFrontDeskRoute = AuthenticatedFrontDeskRouteImport.update({
+  id: '/_authenticated/front-desk',
   path: '/front-desk',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/_authenticated/reports',
   path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RestaurantRoute = RestaurantRouteImport.update({
-  id: '/restaurant',
+const AuthenticatedRestaurantRoute = AuthenticatedRestaurantRouteImport.update({
+  id: '/_authenticated/restaurant',
   path: '/restaurant',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RoomsRoute = RoomsRouteImport.update({
-  id: '/rooms',
+const AuthenticatedRoomsRoute = AuthenticatedRoomsRouteImport.update({
+  id: '/_authenticated/rooms',
   path: '/rooms',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/front-desk': typeof FrontDeskRoute
-  '/reports': typeof ReportsRoute
-  '/restaurant': typeof RestaurantRoute
-  '/rooms': typeof RoomsRoute
+  '/front-desk': typeof AuthenticatedFrontDeskRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/restaurant': typeof AuthenticatedRestaurantRoute
+  '/rooms': typeof AuthenticatedRoomsRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/front-desk': typeof FrontDeskRoute
-  '/reports': typeof ReportsRoute
-  '/restaurant': typeof RestaurantRoute
-  '/rooms': typeof RoomsRoute
+  '/front-desk': typeof AuthenticatedFrontDeskRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/restaurant': typeof AuthenticatedRestaurantRoute
+  '/rooms': typeof AuthenticatedRoomsRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/front-desk': typeof FrontDeskRoute
-  '/reports': typeof ReportsRoute
-  '/restaurant': typeof RestaurantRoute
-  '/rooms': typeof RoomsRoute
+  '/_authenticated/front-desk': typeof AuthenticatedFrontDeskRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/restaurant': typeof AuthenticatedRestaurantRoute
+  '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/front-desk' | '/reports' | '/restaurant' | '/rooms'
+  fullPaths: '/front-desk' | '/reports' | '/restaurant' | '/rooms' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/front-desk' | '/reports' | '/restaurant' | '/rooms'
-  id: '__root__' | '/' | '/front-desk' | '/reports' | '/restaurant' | '/rooms'
+  to: '/front-desk' | '/reports' | '/restaurant' | '/rooms' | '/'
+  id:
+    | '__root__'
+    | '/_authenticated/front-desk'
+    | '/_authenticated/reports'
+    | '/_authenticated/restaurant'
+    | '/_authenticated/rooms'
+    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  FrontDeskRoute: typeof FrontDeskRoute
-  ReportsRoute: typeof ReportsRoute
-  RestaurantRoute: typeof RestaurantRoute
-  RoomsRoute: typeof RoomsRoute
+  AuthenticatedFrontDeskRoute: typeof AuthenticatedFrontDeskRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedRestaurantRoute: typeof AuthenticatedRestaurantRoute
+  AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/front-desk': {
-      id: '/front-desk'
+    '/_authenticated/front-desk': {
+      id: '/_authenticated/front-desk'
       path: '/front-desk'
       fullPath: '/front-desk'
-      preLoaderRoute: typeof FrontDeskRouteImport
+      preLoaderRoute: typeof AuthenticatedFrontDeskRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reports': {
-      id: '/reports'
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
       path: '/reports'
       fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/restaurant': {
-      id: '/restaurant'
+    '/_authenticated/restaurant': {
+      id: '/_authenticated/restaurant'
       path: '/restaurant'
       fullPath: '/restaurant'
-      preLoaderRoute: typeof RestaurantRouteImport
+      preLoaderRoute: typeof AuthenticatedRestaurantRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rooms': {
-      id: '/rooms'
+    '/_authenticated/rooms': {
+      id: '/_authenticated/rooms'
       path: '/rooms'
       fullPath: '/rooms'
-      preLoaderRoute: typeof RoomsRouteImport
+      preLoaderRoute: typeof AuthenticatedRoomsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  FrontDeskRoute: FrontDeskRoute,
-  ReportsRoute: ReportsRoute,
-  RestaurantRoute: RestaurantRoute,
-  RoomsRoute: RoomsRoute,
+  AuthenticatedFrontDeskRoute: AuthenticatedFrontDeskRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedRestaurantRoute: AuthenticatedRestaurantRoute,
+  AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

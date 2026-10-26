@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -73,42 +74,21 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-const nav = [
-  { to: "/", label: "Dashboard" },
-  { to: "/front-desk", label: "Front Desk" },
-  { to: "/rooms", label: "Rooms" },
-  { to: "/restaurant", label: "Restaurant" },
-  { to: "/reports", label: "Reports" },
-] as const;
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      router.invalidate();
+      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      else queryClient.clear();
+    });
+    return () => data.subscription.unsubscribe();
+  }, [router, queryClient]);
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen flex-col md:flex-row">
-        <aside className="bg-sidebar text-sidebar-foreground md:w-56 md:shrink-0">
-          <div className="p-5">
-            <div className="font-display text-xl font-bold">Lodge Manager</div>
-            <div className="text-xs opacity-70">Front office</div>
-          </div>
-          <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col">
-            {nav.map((n) => (
-              <Link
-                key={n.to}
-                to={n.to}
-                activeOptions={{ exact: true }}
-                className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium opacity-80 hover:opacity-100"
-                activeProps={{ className: "bg-primary text-primary-foreground opacity-100" }}
-              >
-                {n.label}
-              </Link>
-            ))}
-          </nav>
-        </aside>
-        <main className="flex-1 p-4 md:p-8">
-          <Outlet />
-        </main>
-      </div>
+      <Outlet />
     </QueryClientProvider>
   );
 }
