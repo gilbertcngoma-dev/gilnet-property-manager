@@ -11,6 +11,8 @@ export const Route = createFileRoute("/front-desk")({
       { name: "description", content: "Check in guests and track current stays." },
       { property: "og:title", content: "Front Desk — Lodge Manager" },
       { property: "og:description", content: "Check in guests and track current stays." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: FrontDesk,

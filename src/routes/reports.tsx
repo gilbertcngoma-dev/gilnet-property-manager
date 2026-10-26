@@ -9,6 +9,8 @@ export const Route = createFileRoute("/reports")({
       { name: "description", content: "Revenue by room type, payments and laundry income." },
       { property: "og:title", content: "Reports — Lodge Manager" },
       { property: "og:description", content: "Revenue by room type, payments and laundry income." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Reports,

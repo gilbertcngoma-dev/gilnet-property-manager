@@ -9,6 +9,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Occupancy, revenue and balances at a glance." },
       { property: "og:title", content: "Dashboard — Lodge Manager" },
       { property: "og:description", content: "Occupancy, revenue and balances at a glance." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Dashboard,

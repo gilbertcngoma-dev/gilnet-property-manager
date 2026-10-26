@@ -21,6 +21,8 @@ export const Route = createFileRoute("/restaurant")({
       { name: "description", content: "Record restaurant and bar sales." },
       { property: "og:title", content: "Restaurant — Lodge Manager" },
       { property: "og:description", content: "Record restaurant and bar sales." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Restaurant,

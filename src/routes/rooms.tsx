@@ -12,6 +12,8 @@ export const Route = createFileRoute("/rooms")({
       { name: "description", content: "Colour-coded room status board." },
       { property: "og:title", content: "Rooms — Lodge Manager" },
       { property: "og:description", content: "Colour-coded room status board." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Rooms,
@@ -38,9 +40,10 @@ function Rooms() {
     e.preventDefault();
     if (!extending || !canExtendStay(extending.check_out, checkout)) { setMessage("Choose a date later than the current check-out."); return; }
     setSaving(true);
-    const { error } = await supabase.from("stays").update({ check_out: checkout }).eq("id", extending.id).eq("check_out", extending.check_out).select("id");
+    const { data, error } = await supabase.from("stays").update({ check_out: checkout }).eq("id", extending.id).eq("check_out", extending.check_out).select("id");
     setSaving(false);
     if (error) { setMessage(error.message); return; }
+    if (!data?.length) { setMessage("This stay changed. Refresh Rooms and try again."); return; }
     await qc.invalidateQueries({ queryKey: ["stays"] });
     setExtending(null); setMessage("Stay extended.");
   }
