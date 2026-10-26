@@ -124,6 +124,7 @@ function FrontDesk() {
                 </tr>); })}
             </tbody>
           </table>
+          </>
         )}
       </div>
     </div>
