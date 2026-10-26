@@ -22,6 +22,13 @@
       "when": 1793031870898,
       "tag": "0002_allow_twin_room_type",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793032965659,
+      "tag": "0003_room_service_and_pending_payments",
+      "breakpoints": true
     }
   ]
 }

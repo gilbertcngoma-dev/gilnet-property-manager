@@ -11,6 +11,8 @@ export const Route = createFileRoute("/front-desk")({
       { name: "description", content: "Check in guests and track current stays." },
       { property: "og:title", content: "Front Desk — Lodge Manager" },
       { property: "og:description", content: "Check in guests and track current stays." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: FrontDesk,
@@ -34,7 +36,7 @@ function FrontDesk() {
     e.preventDefault();
     if (!f.guest_name || !f.room_no || c.nights < 1) { setMsg("Fill guest, room and valid dates."); return; }
     setSaving(true); setMsg("");
-    const { error } = await supabase.from("stays").insert(f);
+    const { error } = await supabase.from("stays").insert({ ...f, amount_paid: f.payment_method === "Pending" ? 0 : f.amount_paid });
     if (!error) await supabase.from("rooms").update({ status: "Occupied" }).eq("room_no", f.room_no);
     setSaving(false);
     if (error) { setMsg(error.message); return; }
@@ -68,7 +70,7 @@ function FrontDesk() {
           </select>
         </div>
         <div><label className="label">Payment method</label>
-          <select className="field" value={f.payment_method} onChange={(e) => set("payment_method", e.target.value)}>
+            <select className="field" value={f.payment_method} onChange={(e) => setF({ ...f, payment_method: e.target.value as Stay["payment_method"], amount_paid: e.target.value === "Pending" ? 0 : f.amount_paid })}>
             {PAYMENT_METHODS.map((m) => <option key={m}>{m}</option>)}
           </select>
         </div>
@@ -76,7 +78,7 @@ function FrontDesk() {
         <div><label className="label">Check-out</label><input type="date" className="field" value={f.check_out} onChange={(e) => set("check_out", e.target.value)} /></div>
         <div><label className="label">Rate / night (K)</label><input type="number" min="0" className="field" value={f.rate_per_night} onChange={(e) => set("rate_per_night", Number(e.target.value))} /></div>
         <div><label className="label">Laundry (K)</label><input type="number" min="0" className="field" value={f.laundry_cost} onChange={(e) => set("laundry_cost", Number(e.target.value))} /></div>
-        <div><label className="label">Amount paid (K)</label><input type="number" min="0" className="field" value={f.amount_paid} onChange={(e) => set("amount_paid", Number(e.target.value))} /></div>
+        <div><label className="label">Amount paid (K)</label><input type="number" min="0" disabled={f.payment_method === "Pending"} className="field" value={f.amount_paid} onChange={(e) => set("amount_paid", Number(e.target.value))} /></div>
         <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-3 text-sm md:col-span-3 md:grid-cols-4">
           <div><div className="label">Nights</div><b>{c.nights}</b></div>
           <div><div className="label">Room revenue</div><b>{kwacha(c.room_revenue)}</b></div>

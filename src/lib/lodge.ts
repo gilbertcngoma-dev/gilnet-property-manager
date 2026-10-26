@@ -18,10 +18,19 @@ export type Stay = {
   rate_per_night: number;
   laundry_cost: number;
   amount_paid: number;
-  payment_method: "Cash" | "Mobile" | "Visa/Card" | "Compliment" | "Airtel" | "Bank";
+  payment_method: "Cash" | "Mobile" | "Visa/Card" | "Compliment" | "Pending" | "Airtel" | "Bank";
 };
 
-export const PAYMENT_METHODS = ["Cash", "Mobile", "Visa/Card", "Compliment"] as const;
+export const PAYMENT_METHODS = ["Cash", "Mobile", "Visa/Card", "Compliment", "Pending"] as const;
+
+export function canExtendStay(currentCheckout: string, newCheckout: string) {
+  return Number.isFinite(Date.parse(newCheckout)) && newCheckout > currentCheckout;
+}
+
+export function currentStayForRoom(stays: Stay[], roomNo: string, today: string) {
+  return stays.filter((s) => s.room_no === roomNo && s.check_in <= today)
+    .sort((a, b) => b.check_in.localeCompare(a.check_in))[0];
+}
 
 export function nightsBetween(checkIn: string, checkOut: string) {
   if (!checkIn || !checkOut) return 0;

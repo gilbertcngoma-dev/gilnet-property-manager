@@ -23,6 +23,7 @@ export type Database = {
           quantity: number
           room_no: string | null
           sale_date: string
+          service_type: string
           unit_price: number
         }
         Insert: {
@@ -33,6 +34,7 @@ export type Database = {
           quantity?: number
           room_no?: string | null
           sale_date?: string
+          service_type?: string
           unit_price?: number
         }
         Update: {
@@ -43,6 +45,7 @@ export type Database = {
           quantity?: number
           room_no?: string | null
           sale_date?: string
+          service_type?: string
           unit_price?: number
         }
         Relationships: []

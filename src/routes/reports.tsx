@@ -9,6 +9,8 @@ export const Route = createFileRoute("/reports")({
       { name: "description", content: "Revenue by room type, payments and laundry income." },
       { property: "og:title", content: "Reports — Lodge Manager" },
       { property: "og:description", content: "Revenue by room type, payments and laundry income." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Reports,
@@ -33,7 +35,7 @@ function Reports() {
   const stays = useQuery(staysQuery).data ?? [];
   const typeOf = Object.fromEntries(rooms.map((r) => [r.room_no, r.room_type]));
   const byType: Record<string, number> = { Standard: 0, Twin: 0, Deluxe: 0, Suite: 0 };
-  const byPay: Record<string, number> = { Cash: 0, Mobile: 0, "Visa/Card": 0, Compliment: 0 };
+   const byPay: Record<string, number> = { Cash: 0, Mobile: 0, "Visa/Card": 0, Compliment: 0, Pending: 0 };
   let laundry = 0;
   for (const s of stays) {
     const c = calcStay(s);

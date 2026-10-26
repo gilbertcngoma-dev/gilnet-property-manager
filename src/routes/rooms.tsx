@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { roomsQuery, type Room } from "@/lib/lodge";
+import { roomsQuery, staysQuery, todayISO, calcStay, kwacha, canExtendStay, currentStayForRoom, type Room, type Stay } from "@/lib/lodge";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/rooms")({
   head: () => ({
@@ -11,6 +12,8 @@ export const Route = createFileRoute("/rooms")({
       { name: "description", content: "Colour-coded room status board." },
       { property: "og:title", content: "Rooms — Lodge Manager" },
       { property: "og:description", content: "Colour-coded room status board." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Rooms,
@@ -26,7 +29,24 @@ const next: Record<Room["status"], Room["status"]> = { Vacant: "Occupied", Occup
 function Rooms() {
   const qc = useQueryClient();
   const rooms = useQuery(roomsQuery).data ?? [];
+  const stays = useQuery(staysQuery).data ?? [];
+  const [extending, setExtending] = useState<Stay | null>(null);
+  const [checkout, setCheckout] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
   const [n, setN] = useState({ room_no: "", room_type: "Standard", floor: 1 });
+
+  async function extend(e: React.FormEvent) {
+    e.preventDefault();
+    if (!extending || !canExtendStay(extending.check_out, checkout)) { setMessage("Choose a date later than the current check-out."); return; }
+    setSaving(true);
+    const { data, error } = await supabase.from("stays").update({ check_out: checkout }).eq("id", extending.id).eq("check_out", extending.check_out).select("id");
+    setSaving(false);
+    if (error) { setMessage(error.message); return; }
+    if (!data?.length) { setMessage("This stay changed. Refresh Rooms and try again."); return; }
+    await qc.invalidateQueries({ queryKey: ["stays"] });
+    setExtending(null); setMessage("Stay extended.");
+  }
 
   async function cycle(r: Room) {
     await supabase.from("rooms").update({ status: next[r.status] }).eq("id", r.id);
@@ -50,14 +70,25 @@ function Rooms() {
       </div>
       <p className="text-sm text-muted-foreground">Tap a room to change its status.</p>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-        {rooms.map((r) => (
-          <button key={r.id} onClick={() => cycle(r)} className={`rounded-xl p-4 text-left shadow-sm transition hover:scale-[1.03] ${tone[r.status]}`}>
+        {rooms.map((r) => { const guest = r.status === "Occupied" ? currentStayForRoom(stays, r.room_no, todayISO()) : undefined; return (
+          <div key={r.id} className={`rounded-lg p-4 shadow-sm ${tone[r.status]}`}>
+          <Button variant="ghost" onClick={() => cycle(r)} className="h-auto w-full flex-col items-start whitespace-normal p-0 text-left hover:bg-transparent">
             <div className="font-display text-2xl font-bold">{r.room_no}</div>
             <div className="text-xs opacity-90">{r.room_type} · Floor {r.floor}</div>
             <div className="mt-2 text-sm font-semibold">{r.status}</div>
-          </button>
-        ))}
+          </Button>
+          {guest && <><div className="mt-2 break-words text-xs">{guest.guest_name}<br />Until {guest.check_out}</div><Button variant="outline" size="sm" className="mt-3 w-full text-foreground" onClick={() => { setExtending(guest); setCheckout(guest.check_out); setMessage(""); }}>Extend stay</Button></>}
+          </div>
+        ); })}
       </div>
+      {message && <p role="status" className="text-sm text-muted-foreground">{message}</p>}
+      {extending && <form onSubmit={extend} className="space-y-3 border-y border-border py-4">
+        <h2 className="text-lg font-semibold">Extend stay — Room {extending.room_no}</h2>
+        <p className="text-sm">{extending.guest_name} · Current check-out: {extending.check_out}</p>
+        <div className="max-w-xs"><label htmlFor="extended-checkout" className="label">New check-out</label><input id="extended-checkout" type="date" required min={new Date(Date.parse(extending.check_out) + 86400000).toISOString().slice(0, 10)} className="field" value={checkout} onChange={(e) => setCheckout(e.target.value)} /></div>
+        <p className="text-sm">{calcStay({ ...extending, check_out: checkout }).nights} nights · Total {kwacha(calcStay({ ...extending, check_out: checkout }).total_revenue)} · Balance {kwacha(calcStay({ ...extending, check_out: checkout }).balance)}</p>
+        <div className="flex gap-2"><Button disabled={saving || !canExtendStay(extending.check_out, checkout)}>{saving ? "Saving…" : "Save extension"}</Button><Button type="button" variant="outline" onClick={() => setExtending(null)}>Cancel</Button></div>
+      </form>}
       <form onSubmit={add} className="card flex flex-wrap items-end gap-3">
         <div><label className="label">Room no</label><input className="field" value={n.room_no} onChange={(e) => setN({ ...n, room_no: e.target.value })} /></div>
         <div><label className="label">Type</label><select className="field" value={n.room_type} onChange={(e) => setN({ ...n, room_type: e.target.value })}><option>Standard</option><option>Twin</option><option>Deluxe</option><option>Suite</option></select></div>
