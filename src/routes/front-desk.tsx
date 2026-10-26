@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { calcStay, kwacha, roomsQuery, staysQuery, todayISO, type Stay } from "@/lib/lodge";
+import { PAYMENT_METHODS, calcStay, kwacha, roomsQuery, staysQuery, todayISO, type Stay } from "@/lib/lodge";
 
 export const Route = createFileRoute("/front-desk")({
   head: () => ({

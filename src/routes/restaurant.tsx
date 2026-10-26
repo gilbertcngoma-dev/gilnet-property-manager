@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { kwacha, todayISO } from "@/lib/lodge";
+import { PAYMENT_METHODS, kwacha, todayISO } from "@/lib/lodge";
 
 export const restaurantQuery = queryOptions({
   queryKey: ["restaurant_sales"],
