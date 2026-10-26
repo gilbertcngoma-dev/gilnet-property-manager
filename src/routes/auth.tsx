@@ -48,6 +48,13 @@ function Auth() {
         <div><label htmlFor="password" className="label">Password</label><input id="password" type="password" required minLength={6} className="field" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
         <button className="btn w-full" disabled={busy}>{busy ? "Please wait…" : mode === "in" ? "Sign in" : "Sign up"}</button>
         {msg && <p className="text-sm text-muted-foreground">{msg}</p>}
+        {mode === "in" && (
+          <button type="button" className="block text-sm underline" onClick={async () => {
+            if (!email) return setMsg("Type your email above first, then tap Forgot password.");
+            const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+            setMsg(error ? error.message : "Check your email for a link to set a new password.");
+          }}>Forgot password?</button>
+        )}
         <button type="button" className="text-sm underline" onClick={() => { setMode(mode === "in" ? "up" : "in"); setMsg(""); }}>
           {mode === "in" ? "New staff? Create an account" : "Have an account? Sign in"}
         </button>

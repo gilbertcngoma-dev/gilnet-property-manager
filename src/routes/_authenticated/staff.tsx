@@ -60,6 +60,7 @@ function StaffPage() {
           New accounts can sign in only after you approve them here. Removing access signs them out of the data immediately.
         </p>
       </div>
+      <CreateStaff onDone={refresh} />
       <div className="card overflow-x-auto p-0">
         <table className="w-full text-sm">
           <thead>
