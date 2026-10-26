@@ -4,7 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PAYMENT_METHODS, calcStay, kwacha, roomsQuery, staysQuery, todayISO, type Stay } from "@/lib/lodge";
 
-export const Route = createFileRoute("/front-desk")({
+export const Route = createFileRoute("/_authenticated/front-desk")({
   head: () => ({
     meta: [
       { title: "Front Desk — Lodge Manager" },

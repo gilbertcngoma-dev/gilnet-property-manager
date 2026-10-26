@@ -14,7 +14,7 @@ export const restaurantQuery = queryOptions({
   },
 });
 
-export const Route = createFileRoute("/restaurant")({
+export const Route = createFileRoute("/_authenticated/restaurant")({
   head: () => ({
     meta: [
       { title: "Restaurant — Lodge Manager" },
