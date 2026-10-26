@@ -1,4 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { createStaffAccount } from "@/lib/staff.functions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { allRolesQuery, myRolesQuery, profilesQuery, type AppRole } from "@/lib/lodge";
@@ -114,5 +117,33 @@ function StaffPage() {
         </table>
       </div>
     </div>
+  );
+}
+
+function CreateStaff({ onDone }: { onDone: () => void }) {
+  const create = useServerFn(createStaffAccount);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true); setMsg("");
+    try {
+      await create({ data: { email, password } });
+      setMsg(`Account created for ${email}. They can sign in now with that password.`);
+      setEmail(""); setPassword(""); onDone();
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Could not create the account.");
+    } finally { setBusy(false); }
+  }
+  return (
+    <form onSubmit={submit} className="card flex flex-wrap items-end gap-3">
+      <div className="w-full font-semibold">Create a staff account</div>
+      <div><label htmlFor="staff-email" className="label">Email</label><input id="staff-email" type="email" required className="field" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+      <div><label htmlFor="staff-password" className="label">Password</label><input id="staff-password" type="text" required minLength={6} className="field" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+      <button className="btn" disabled={busy}>{busy ? "Creating…" : "Create account"}</button>
+      {msg && <p role="status" className="w-full text-sm text-muted-foreground">{msg}</p>}
+    </form>
   );
 }
