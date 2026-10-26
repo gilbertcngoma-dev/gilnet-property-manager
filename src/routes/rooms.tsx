@@ -77,7 +77,7 @@ function Rooms() {
             <div className="text-xs opacity-90">{r.room_type} · Floor {r.floor}</div>
             <div className="mt-2 text-sm font-semibold">{r.status}</div>
           </Button>
-          {guest && <><div className="mt-2 break-words text-xs">{guest.guest_name}<br />Until {guest.check_out}</div><Button variant="outline" size="sm" className="mt-3 w-full" onClick={() => { setExtending(guest); setCheckout(guest.check_out); setMessage(""); }}>Extend stay</Button></>}
+          {guest && <><div className="mt-2 break-words text-xs">{guest.guest_name}<br />Until {guest.check_out}</div><Button variant="outline" size="sm" className="mt-3 w-full text-foreground" onClick={() => { setExtending(guest); setCheckout(guest.check_out); setMessage(""); }}>Extend stay</Button></>}
           </div>
         ); })}
       </div>
