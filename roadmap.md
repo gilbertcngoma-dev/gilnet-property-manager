@@ -1,5 +1,5 @@
 # Requested additions
-- [ ] Add room-service restaurant sales.
-- [ ] Add Pending payment option.
-- [ ] Allow extending stays from Rooms.
-- [ ] Verify the requested flows.
+- [x] Add room-service restaurant sales.
+- [x] Add Pending payment option.
+- [x] Allow extending stays from Rooms.
+- [x] Verify the requested flows.
