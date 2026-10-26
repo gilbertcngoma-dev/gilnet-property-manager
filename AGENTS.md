@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Restaurant service type is stored on each sale so room-service records remain identifiable.
+- Stay extensions update the existing stay's checkout date and reuse shared charge calculations so totals remain consistent across pages.
