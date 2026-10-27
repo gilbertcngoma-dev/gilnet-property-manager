@@ -2,6 +2,7 @@ import { Link, Outlet, createFileRoute, redirect, useNavigate } from "@tanstack/
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { myRolesQuery } from "@/lib/lodge";
+import { InstallAppButton } from "@/components/install-app";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -79,6 +80,7 @@ function Layout() {
             Sign out
           </button>
         </nav>
+        <div className="border-t border-sidebar-foreground/20 px-3 py-2"><InstallAppButton /></div>
       </aside>
       <main className="flex-1 p-4 md:p-8"><Outlet /></main>
     </div>

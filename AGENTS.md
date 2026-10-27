@@ -12,3 +12,4 @@
 - Restaurant service type is stored on each sale so room-service records remain identifiable.
 - Stay extensions update the existing stay's checkout date and reuse shared charge calculations so totals remain consistent across pages.
 - Windows desktop packaging uses the isolated Electron wrapper in electron/ to load the published app; package its files under resources/app and preserve all Electron runtime files, so the website and desktop share records without changing the web build.
+- Capture browser install events in the root InstallAppProvider and present installation through the staff layout; retain manifest-only support without a service worker because home-screen installation does not require offline caching.
