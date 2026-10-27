@@ -12,6 +12,10 @@ export const Route = createFileRoute("/_authenticated/staff")({
     meta: [
       { title: "Staff access — Lodge Manager" },
       { name: "description", content: "Approve or remove staff access to the lodge app." },
+      { property: "og:title", content: "Staff access — Chaniche Lodge" },
+      { property: "og:description", content: "Approve or remove staff access to the lodge app." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: StaffPage,
