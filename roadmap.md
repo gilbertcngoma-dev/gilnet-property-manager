@@ -1,5 +1,5 @@
 # Requested additions
-- [ ] Add and verify an install button with Chrome/Edge instructions and availability status.
+- [x] Add and verify an install button with Chrome/Edge instructions and availability status (signed-in preview checked; native installation requires the published site).
 - [x] Add room-service restaurant sales.
 - [x] Add Pending payment option.
 - [x] Allow extending stays from Rooms.

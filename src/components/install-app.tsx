@@ -116,7 +116,7 @@ export function InstallAppButton() {
         {state !== "installed" && <>
           <div className="space-y-4 text-sm">
             <section className="space-y-1"><h3 className="font-semibold">Google Chrome</h3><p className="text-muted-foreground">Open the app link, then select ⋮ → Cast, save, and share → Install page as app… and confirm. You can also select the install icon in the address bar when it appears.</p></section>
-            <section className="space-y-1"><h3 className="font-semibold">Microsoft Edge</h3><p className="text-muted-foreground">Open the app link, then select … → Apps → Install this site as an app and confirm. If offered, choose Create desktop shortcut or Pin to taskbar.</p></section>
+            <section className="space-y-1"><h3 className="font-semibold">Microsoft Edge</h3><p className="text-muted-foreground">Open the app link, then select … → More tools → Apps → Install this site as an app and confirm. Some versions show Apps directly in the menu. If offered, choose Create desktop shortcut or Pin to taskbar.</p></section>
             <p className="text-xs text-muted-foreground">Menu wording can vary with browser version. If no install option appears, update Chrome or Edge and try again. Your existing sign-in and lodge records stay the same.</p>
           </div>
           <Button asChild variant="outline"><a href="https://lodgeflow-stay-and-revenue.lovable.app" target="_blank" rel="noopener noreferrer"><ExternalLink />Open app link</a></Button>
