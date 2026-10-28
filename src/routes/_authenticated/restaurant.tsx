@@ -14,6 +14,17 @@ export const restaurantQuery = queryOptions({
   },
 });
 
+type Sale = {
+  id: string;
+  sale_date: string;
+  item: string;
+  quantity: number;
+  unit_price: number;
+  room_no: string | null;
+  payment_method: string;
+  service_type: string;
+};
+
 export const Route = createFileRoute("/_authenticated/restaurant")({
   head: () => ({
     meta: [
@@ -35,6 +46,7 @@ function Restaurant() {
   const [f, setF] = useState(blank);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editing, setEditing] = useState<Sale | null>(null);
   const today = todayISO();
   const month = today.slice(0, 7);
   const total = (s: { quantity: number; unit_price: number }) => Number(s.quantity) * Number(s.unit_price);
@@ -76,6 +88,7 @@ function Restaurant() {
         <Button disabled={saving}>{saving ? "Saving…" : "Add sale"}</Button>
         {message && <p role="status" className="text-sm text-muted-foreground">{message}</p>}
       </form>
+      {editing && <EditSale sale={editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["restaurant_sales"] }); }} />}
       <div className="card overflow-x-auto">
         <table className="w-full text-sm">
           <thead><tr className="text-left text-muted-foreground"><th className="p-2">Date</th><th className="p-2">Item</th><th className="p-2">Service</th><th className="p-2">Qty</th><th className="p-2">Room</th><th className="p-2">Payment</th><th className="p-2 text-right">Total</th><th /></tr></thead>
@@ -85,7 +98,10 @@ function Restaurant() {
                 <td className="p-2">{s.sale_date}</td><td className="p-2">{s.item}</td><td className="p-2">{s.service_type}</td><td className="p-2">{s.quantity}</td>
                 <td className="p-2">{s.room_no ?? "-"}</td><td className="p-2">{s.payment_method}</td>
                 <td className="p-2 text-right font-semibold">{kwacha(total(s))}</td>
-                <td className="p-2 text-right"><button type="button" className="text-xs text-destructive" onClick={() => remove(s.id)}>Delete</button></td>
+                <td className="p-2 text-right whitespace-nowrap">
+                  <button type="button" className="mr-3 text-xs text-primary" onClick={() => setEditing(s as Sale)}>Edit</button>
+                  <button type="button" className="text-xs text-destructive" onClick={() => remove(s.id)}>Delete</button>
+                </td>
               </tr>
             ))}
             {sales.length === 0 && <tr><td colSpan={8} className="p-4 text-center text-muted-foreground">No sales yet.</td></tr>}
@@ -93,5 +109,39 @@ function Restaurant() {
         </table>
       </div>
     </div>
+  );
+}
+
+function EditSale({ sale, onClose, onSaved }: { sale: Sale; onClose: () => void; onSaved: () => void }) {
+  const [f, setF] = useState({ sale_date: sale.sale_date, item: sale.item, quantity: sale.quantity, unit_price: sale.unit_price, room_no: sale.room_no ?? "", payment_method: sale.payment_method, service_type: sale.service_type });
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+  const total = f.quantity * f.unit_price;
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (!f.item || (f.service_type === "Room service" && !f.room_no.trim())) { setMsg("Enter an item and a room number for room service."); return; }
+    setSaving(true);
+    const { error } = await supabase.from("restaurant_sales").update({ ...f, room_no: f.room_no.trim() || null }).eq("id", sale.id);
+    setSaving(false);
+    if (error) { setMsg(error.message); return; }
+    onSaved();
+  }
+
+  return (
+    <form onSubmit={save} className="card flex flex-wrap items-end gap-3">
+      <h2 className="w-full text-lg font-semibold">Edit sale — {sale.item}</h2>
+      <div><label className="label">Service</label><select className="field" value={f.service_type} onChange={(e) => setF({ ...f, service_type: e.target.value })}><option>Restaurant</option><option>Room service</option></select></div>
+      <div><label className="label">Date</label><input type="date" className="field" value={f.sale_date} onChange={(e) => setF({ ...f, sale_date: e.target.value })} /></div>
+      <div><label className="label">Item</label><input className="field" value={f.item} onChange={(e) => setF({ ...f, item: e.target.value })} /></div>
+      <div><label className="label">Qty</label><input type="number" min={1} className="field w-20" value={f.quantity} onChange={(e) => setF({ ...f, quantity: Number(e.target.value) })} /></div>
+      <div><label className="label">Price (K)</label><input type="number" min={0} step="0.01" className="field w-28" value={f.unit_price} onChange={(e) => setF({ ...f, unit_price: Number(e.target.value) })} /></div>
+      <div><label className="label">{f.service_type === "Room service" ? "Room number" : "Room (optional)"}</label><input className="field w-24" value={f.room_no} onChange={(e) => setF({ ...f, room_no: e.target.value })} /></div>
+      <div><label className="label">Payment</label><select className="field" value={f.payment_method} onChange={(e) => setF({ ...f, payment_method: e.target.value })}>{PAYMENT_METHODS.map((m) => <option key={m}>{m}</option>)}</select></div>
+      <div className="text-sm font-semibold">Total: {kwacha(total)}</div>
+      <Button disabled={saving}>{saving ? "Saving…" : "Save changes"}</Button>
+      <button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>
+      {msg && <span className="text-sm text-muted-foreground">{msg}</span>}
+    </form>
   );
 }
