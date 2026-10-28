@@ -103,3 +103,13 @@ export const allRolesQuery = queryOptions({
     return data as { id: string; user_id: string; role: AppRole }[];
   },
 });
+
+export const ROOM_NUMBERS = Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(2, "0"));
+
+export const MENU_ITEMS = [
+  "Chicken", "Pork", "T-Bone", "Fish", "Kapenta", "G-Meat", "Plain Chips", "Plain Nshima",
+  "Dis Coke", "Dis Fanta", "Dis Sprite", "Bottled Coke", "Bottled Fanta", "Bottled Sprite",
+  "Merinda", "Pepsi", "Fruitcana", "Big Water", "Small Water", "Fresh Up",
+] as const;
+
+export const ROOM_SERVICE_CHARGE_ITEM = "Room service charge";
