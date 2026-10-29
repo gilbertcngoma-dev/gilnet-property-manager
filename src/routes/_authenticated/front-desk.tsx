@@ -26,7 +26,7 @@ function FrontDesk() {
   const qc = useQueryClient();
   const rooms = useQuery(roomsQuery).data ?? [];
   const stays = useQuery(staysQuery).data ?? [];
-  const blank = { guest_name: "", check_in: todayISO(), check_out: tomorrow(), room_no: "", rate_per_night: 0, laundry_cost: 0, amount_paid: 0, payment_method: "Cash" as Stay["payment_method"] };
+  const blank = { guest_name: "", phone: "", guest_requests: "", check_in: todayISO(), check_out: tomorrow(), room_no: "", rate_per_night: 0, laundry_cost: 0, amount_paid: 0, payment_method: "Cash" as Stay["payment_method"] };
   const [f, setF] = useState(blank);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -75,6 +75,7 @@ function FrontDesk() {
       <h1 className="text-3xl font-bold">Front Desk</h1>
       <form onSubmit={submit} className="card grid gap-4 md:grid-cols-4">
         <div className="md:col-span-2"><label className="label">Guest name</label><input className="field" value={f.guest_name} onChange={(e) => set("guest_name", e.target.value)} /></div>
+        <div><label className="label">Phone</label><input className="field" placeholder="e.g. 0977 000 000" value={f.phone} onChange={(e) => set("phone", e.target.value)} /></div>
         <div><label className="label">Room</label>
           <select className="field" value={f.room_no} onChange={(e) => set("room_no", e.target.value)}>
             <option value="">Select vacant room</option>
@@ -91,6 +92,7 @@ function FrontDesk() {
         <div><label className="label">Rate / night (K)</label><input type="number" min="0" className="field" value={f.rate_per_night} onChange={(e) => set("rate_per_night", Number(e.target.value))} /></div>
         <div><label className="label">Laundry (K)</label><input type="number" min="0" className="field" value={f.laundry_cost} onChange={(e) => set("laundry_cost", Number(e.target.value))} /></div>
         <div><label className="label">Amount paid (K)</label><input type="number" min="0" disabled={f.payment_method === "Pending"} className="field" value={f.amount_paid} onChange={(e) => set("amount_paid", Number(e.target.value))} /></div>
+        <div className="md:col-span-4"><label className="label">Guest requests</label><input className="field" placeholder="e.g. extra towels, early breakfast" value={f.guest_requests} onChange={(e) => set("guest_requests", e.target.value)} /></div>
         <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-3 text-sm md:col-span-3 md:grid-cols-4">
           <div><div className="label">Nights</div><b>{c.nights}</b></div>
           <div><div className="label">Room revenue</div><b>{kwacha(c.room_revenue)}</b></div>
