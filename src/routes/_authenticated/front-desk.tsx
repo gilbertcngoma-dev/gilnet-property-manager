@@ -121,6 +121,8 @@ function FrontDesk() {
                   <span className="text-muted-foreground">Room {s.room_no}</span>
                 </div>
                 <div className="text-xs text-muted-foreground">{s.check_in} → {s.check_out} · {k.nights} night{k.nights === 1 ? "" : "s"}</div>
+                {s.phone && <div className="text-xs">📞 {s.phone}</div>}
+                {s.guest_requests && <div className="text-xs text-muted-foreground">Requests: {s.guest_requests}</div>}
                 <div className="grid grid-cols-3 gap-2">
                   <div><div className="label">Total</div><b>{kwacha(k.total_revenue)}</b></div>
                   <div><div className="label">Paid (K)</div><input type="number" className="field w-full py-1" defaultValue={s.amount_paid} onBlur={(e) => Number(e.target.value) !== Number(s.amount_paid) && updatePaid(s, Number(e.target.value))} /></div>
@@ -134,7 +136,7 @@ function FrontDesk() {
             <tbody className="divide-y">
               {latestPerRoom.map((s) => { const k = calcStay(s); return (
                 <tr key={s.id}>
-                  <td className="py-2 font-medium">{s.guest_name}</td><td>{s.room_no}</td>
+                  <td className="py-2 font-medium">{s.guest_name}{s.phone && <div className="text-xs font-normal text-muted-foreground">{s.phone}</div>}{s.guest_requests && <div className="text-xs font-normal text-muted-foreground">Requests: {s.guest_requests}</div>}</td><td>{s.room_no}</td>
                   <td>{s.check_in} → {s.check_out}</td><td>{k.nights}</td><td>{kwacha(k.total_revenue)}</td>
                   <td><input type="number" className="field w-24 py-1" defaultValue={s.amount_paid} onBlur={(e) => Number(e.target.value) !== Number(s.amount_paid) && updatePaid(s, Number(e.target.value))} /></td>
                   <td className={k.balance > 0 ? "font-semibold text-destructive" : ""}>{kwacha(k.balance)}</td>
