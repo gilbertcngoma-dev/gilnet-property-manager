@@ -36,6 +36,13 @@
       "when": 1793035675229,
       "tag": "0004_staff_only_access",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793245461390,
+      "tag": "0005_add_guest_contact_to_stays",
+      "breakpoints": true
     }
   ]
 }
