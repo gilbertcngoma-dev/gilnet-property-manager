@@ -19,6 +19,8 @@ export type Stay = {
   laundry_cost: number;
   amount_paid: number;
   payment_method: "Cash" | "Mobile" | "Visa/Card" | "Compliment" | "Pending" | "Airtel" | "Bank";
+  phone: string | null;
+  guest_requests: string | null;
 };
 
 export const PAYMENT_METHODS = ["Cash", "Mobile", "Visa/Card", "Compliment", "Pending"] as const;
@@ -30,6 +32,16 @@ export function canExtendStay(currentCheckout: string, newCheckout: string) {
 export function currentStayForRoom(stays: Stay[], roomNo: string, today: string) {
   return stays.filter((s) => s.room_no === roomNo && s.check_in <= today)
     .sort((a, b) => b.check_in.localeCompare(a.check_in))[0];
+}
+
+export function upcomingReservations(stays: Stay[], today: string) {
+  return stays.filter((s) => s.check_in > today)
+    .sort((a, b) => a.check_in.localeCompare(b.check_in));
+}
+
+export function checkoutHistory(stays: Stay[], today: string) {
+  return stays.filter((s) => s.check_out < today)
+    .sort((a, b) => b.check_out.localeCompare(a.check_out));
 }
 
 export function nightsBetween(checkIn: string, checkOut: string) {
