@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { calcStay, kwacha, roomsQuery, staysQuery, todayISO } from "@/lib/lodge";
+import { calcStay, checkoutHistory, kwacha, roomsQuery, staysQuery, todayISO, upcomingReservations, type Stay } from "@/lib/lodge";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -29,6 +29,8 @@ function Dashboard() {
   const owed = stays.reduce((a, s) => a + Math.max(0, calcStay(s).balance), 0);
   const ins = stays.filter((s) => s.check_in === today);
   const outs = stays.filter((s) => s.check_out === today);
+  const reservations = upcomingReservations(stays, today);
+  const history = checkoutHistory(stays, today).slice(0, 10);
 
   return (
     <div className="space-y-6">
