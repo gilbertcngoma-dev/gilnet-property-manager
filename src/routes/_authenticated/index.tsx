@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { calcStay, kwacha, roomsQuery, staysQuery, todayISO } from "@/lib/lodge";
+import { calcStay, checkoutHistory, kwacha, roomsQuery, staysQuery, todayISO, upcomingReservations, type Stay } from "@/lib/lodge";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -29,6 +29,8 @@ function Dashboard() {
   const owed = stays.reduce((a, s) => a + Math.max(0, calcStay(s).balance), 0);
   const ins = stays.filter((s) => s.check_in === today);
   const outs = stays.filter((s) => s.check_out === today);
+  const reservations = upcomingReservations(stays, today);
+  const history = checkoutHistory(stays, today).slice(0, 10);
 
   return (
     <div className="space-y-6">
@@ -47,6 +49,34 @@ function Dashboard() {
       <div className="grid gap-4 lg:grid-cols-2">
         <List title="Today's check-ins" items={ins} />
         <List title="Today's check-outs" items={outs} />
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="card">
+          <h2 className="mb-3 text-lg font-semibold">Upcoming reservations</h2>
+          {reservations.length === 0 ? <p className="text-sm text-muted-foreground">No future bookings.</p> : (
+            <ul className="divide-y">
+              {reservations.map((s) => (
+                <li key={s.id} className="py-2 text-sm">
+                  <div className="flex justify-between"><span>{s.guest_name}</span><span className="font-semibold">Room {s.room_no}</span></div>
+                  <div className="text-xs text-muted-foreground">{s.check_in} → {s.check_out}{s.phone ? ` · ${s.phone}` : ""}</div>
+                  {s.guest_requests && <div className="text-xs text-muted-foreground">Requests: {s.guest_requests}</div>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="card">
+          <h2 className="mb-3 text-lg font-semibold">Check-out history</h2>
+          {history.length === 0 ? <p className="text-sm text-muted-foreground">No past check-outs yet.</p> : (
+            <ul className="divide-y">
+              {history.map((s) => { const k = calcStay(s); return (
+                <li key={s.id} className="py-2 text-sm">
+                  <div className="flex justify-between"><span>{s.guest_name}</span><span className="font-semibold">Room {s.room_no}</span></div>
+                  <div className="text-xs text-muted-foreground">Left {s.check_out} · {k.nights} night{k.nights === 1 ? "" : "s"} · Total {kwacha(k.total_revenue)} · {s.payment_method}</div>
+                </li>); })}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -102,9 +102,11 @@ export type Database = {
           check_out: string
           created_at: string
           guest_name: string
+          guest_requests: string | null
           id: string
           laundry_cost: number
           payment_method: string
+          phone: string | null
           rate_per_night: number
           room_no: string
         }
@@ -114,9 +116,11 @@ export type Database = {
           check_out: string
           created_at?: string
           guest_name: string
+          guest_requests?: string | null
           id?: string
           laundry_cost?: number
           payment_method?: string
+          phone?: string | null
           rate_per_night?: number
           room_no: string
         }
@@ -126,9 +130,11 @@ export type Database = {
           check_out?: string
           created_at?: string
           guest_name?: string
+          guest_requests?: string | null
           id?: string
           laundry_cost?: number
           payment_method?: string
+          phone?: string | null
           rate_per_night?: number
           room_no?: string
         }

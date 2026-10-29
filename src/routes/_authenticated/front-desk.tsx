@@ -26,7 +26,7 @@ function FrontDesk() {
   const qc = useQueryClient();
   const rooms = useQuery(roomsQuery).data ?? [];
   const stays = useQuery(staysQuery).data ?? [];
-  const blank = { guest_name: "", check_in: todayISO(), check_out: tomorrow(), room_no: "", rate_per_night: 0, laundry_cost: 0, amount_paid: 0, payment_method: "Cash" as Stay["payment_method"] };
+  const blank = { guest_name: "", phone: "", guest_requests: "", check_in: todayISO(), check_out: tomorrow(), room_no: "", rate_per_night: 0, laundry_cost: 0, amount_paid: 0, payment_method: "Cash" as Stay["payment_method"] };
   const [f, setF] = useState(blank);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -39,7 +39,7 @@ function FrontDesk() {
     e.preventDefault();
     if (!f.guest_name || !f.room_no || c.nights < 1) { setMsg("Fill guest, room and valid dates."); return; }
     setSaving(true); setMsg("");
-    const { error } = await supabase.from("stays").insert({ ...f, amount_paid: f.payment_method === "Pending" ? 0 : f.amount_paid });
+    const { error } = await supabase.from("stays").insert({ ...f, phone: f.phone || null, guest_requests: f.guest_requests || null, amount_paid: f.payment_method === "Pending" ? 0 : f.amount_paid });
     if (!error) await supabase.from("rooms").update({ status: "Occupied" }).eq("room_no", f.room_no);
     setSaving(false);
     if (error) { setMsg(error.message); return; }
@@ -75,6 +75,7 @@ function FrontDesk() {
       <h1 className="text-3xl font-bold">Front Desk</h1>
       <form onSubmit={submit} className="card grid gap-4 md:grid-cols-4">
         <div className="md:col-span-2"><label className="label">Guest name</label><input className="field" value={f.guest_name} onChange={(e) => set("guest_name", e.target.value)} /></div>
+        <div><label className="label">Phone</label><input className="field" placeholder="e.g. 0977 000 000" value={f.phone} onChange={(e) => set("phone", e.target.value)} /></div>
         <div><label className="label">Room</label>
           <select className="field" value={f.room_no} onChange={(e) => set("room_no", e.target.value)}>
             <option value="">Select vacant room</option>
@@ -91,6 +92,7 @@ function FrontDesk() {
         <div><label className="label">Rate / night (K)</label><input type="number" min="0" className="field" value={f.rate_per_night} onChange={(e) => set("rate_per_night", Number(e.target.value))} /></div>
         <div><label className="label">Laundry (K)</label><input type="number" min="0" className="field" value={f.laundry_cost} onChange={(e) => set("laundry_cost", Number(e.target.value))} /></div>
         <div><label className="label">Amount paid (K)</label><input type="number" min="0" disabled={f.payment_method === "Pending"} className="field" value={f.amount_paid} onChange={(e) => set("amount_paid", Number(e.target.value))} /></div>
+        <div className="md:col-span-4"><label className="label">Guest requests</label><input className="field" placeholder="e.g. extra towels, early breakfast" value={f.guest_requests} onChange={(e) => set("guest_requests", e.target.value)} /></div>
         <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-3 text-sm md:col-span-3 md:grid-cols-4">
           <div><div className="label">Nights</div><b>{c.nights}</b></div>
           <div><div className="label">Room revenue</div><b>{kwacha(c.room_revenue)}</b></div>
@@ -119,6 +121,8 @@ function FrontDesk() {
                   <span className="text-muted-foreground">Room {s.room_no}</span>
                 </div>
                 <div className="text-xs text-muted-foreground">{s.check_in} → {s.check_out} · {k.nights} night{k.nights === 1 ? "" : "s"}</div>
+                {s.phone && <div className="text-xs">📞 {s.phone}</div>}
+                {s.guest_requests && <div className="text-xs text-muted-foreground">Requests: {s.guest_requests}</div>}
                 <div className="grid grid-cols-3 gap-2">
                   <div><div className="label">Total</div><b>{kwacha(k.total_revenue)}</b></div>
                   <div><div className="label">Paid (K)</div><input type="number" className="field w-full py-1" defaultValue={s.amount_paid} onBlur={(e) => Number(e.target.value) !== Number(s.amount_paid) && updatePaid(s, Number(e.target.value))} /></div>
@@ -132,7 +136,7 @@ function FrontDesk() {
             <tbody className="divide-y">
               {latestPerRoom.map((s) => { const k = calcStay(s); return (
                 <tr key={s.id}>
-                  <td className="py-2 font-medium">{s.guest_name}</td><td>{s.room_no}</td>
+                  <td className="py-2 font-medium">{s.guest_name}{s.phone && <div className="text-xs font-normal text-muted-foreground">{s.phone}</div>}{s.guest_requests && <div className="text-xs font-normal text-muted-foreground">Requests: {s.guest_requests}</div>}</td><td>{s.room_no}</td>
                   <td>{s.check_in} → {s.check_out}</td><td>{k.nights}</td><td>{kwacha(k.total_revenue)}</td>
                   <td><input type="number" className="field w-24 py-1" defaultValue={s.amount_paid} onBlur={(e) => Number(e.target.value) !== Number(s.amount_paid) && updatePaid(s, Number(e.target.value))} /></td>
                   <td className={k.balance > 0 ? "font-semibold text-destructive" : ""}>{kwacha(k.balance)}</td>
@@ -148,7 +152,7 @@ function FrontDesk() {
 }
 
 function EditStay({ stay, onClose, onSaved }: { stay: Stay; onClose: () => void; onSaved: () => void }) {
-  const [f, setF] = useState({ guest_name: stay.guest_name, check_in: stay.check_in, check_out: stay.check_out, rate_per_night: stay.rate_per_night, laundry_cost: stay.laundry_cost, payment_method: stay.payment_method });
+  const [f, setF] = useState({ guest_name: stay.guest_name, phone: stay.phone ?? "", guest_requests: stay.guest_requests ?? "", check_in: stay.check_in, check_out: stay.check_out, rate_per_night: stay.rate_per_night, laundry_cost: stay.laundry_cost, payment_method: stay.payment_method });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const c = calcStay({ ...f, amount_paid: stay.amount_paid });
@@ -157,7 +161,7 @@ function EditStay({ stay, onClose, onSaved }: { stay: Stay; onClose: () => void;
     e.preventDefault();
     if (!f.guest_name || c.nights < 1) { setMsg("Fill guest name and valid dates."); return; }
     setSaving(true);
-    const { error } = await supabase.from("stays").update(f).eq("id", stay.id);
+    const { error } = await supabase.from("stays").update({ ...f, phone: f.phone || null, guest_requests: f.guest_requests || null }).eq("id", stay.id);
     setSaving(false);
     if (error) { setMsg(error.message); return; }
     onSaved();
@@ -167,6 +171,8 @@ function EditStay({ stay, onClose, onSaved }: { stay: Stay; onClose: () => void;
     <form onSubmit={save} className="card grid gap-4 md:grid-cols-4">
       <h2 className="text-lg font-semibold md:col-span-4">Edit stay — {stay.guest_name} (Room {stay.room_no})</h2>
       <div className="md:col-span-2"><label className="label">Guest name</label><input className="field" value={f.guest_name} onChange={(e) => setF({ ...f, guest_name: e.target.value })} /></div>
+      <div><label className="label">Phone</label><input className="field" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></div>
+      <div><label className="label">Guest requests</label><input className="field" value={f.guest_requests} onChange={(e) => setF({ ...f, guest_requests: e.target.value })} /></div>
       <div><label className="label">Check-in</label><input type="date" className="field" value={f.check_in} onChange={(e) => setF({ ...f, check_in: e.target.value })} /></div>
       <div><label className="label">Check-out</label><input type="date" className="field" value={f.check_out} onChange={(e) => setF({ ...f, check_out: e.target.value })} /></div>
       <div><label className="label">Rate / night (K)</label><input type="number" min="0" className="field" value={f.rate_per_night} onChange={(e) => setF({ ...f, rate_per_night: Number(e.target.value) })} /></div>
