@@ -159,7 +159,7 @@ function EditStay({ stay, onClose, onSaved }: { stay: Stay; onClose: () => void;
     e.preventDefault();
     if (!f.guest_name || c.nights < 1) { setMsg("Fill guest name and valid dates."); return; }
     setSaving(true);
-    const { error } = await supabase.from("stays").update(f).eq("id", stay.id);
+    const { error } = await supabase.from("stays").update({ ...f, phone: f.phone || null, guest_requests: f.guest_requests || null }).eq("id", stay.id);
     setSaving(false);
     if (error) { setMsg(error.message); return; }
     onSaved();
@@ -169,6 +169,8 @@ function EditStay({ stay, onClose, onSaved }: { stay: Stay; onClose: () => void;
     <form onSubmit={save} className="card grid gap-4 md:grid-cols-4">
       <h2 className="text-lg font-semibold md:col-span-4">Edit stay — {stay.guest_name} (Room {stay.room_no})</h2>
       <div className="md:col-span-2"><label className="label">Guest name</label><input className="field" value={f.guest_name} onChange={(e) => setF({ ...f, guest_name: e.target.value })} /></div>
+      <div><label className="label">Phone</label><input className="field" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></div>
+      <div><label className="label">Guest requests</label><input className="field" value={f.guest_requests} onChange={(e) => setF({ ...f, guest_requests: e.target.value })} /></div>
       <div><label className="label">Check-in</label><input type="date" className="field" value={f.check_in} onChange={(e) => setF({ ...f, check_in: e.target.value })} /></div>
       <div><label className="label">Check-out</label><input type="date" className="field" value={f.check_out} onChange={(e) => setF({ ...f, check_out: e.target.value })} /></div>
       <div><label className="label">Rate / night (K)</label><input type="number" min="0" className="field" value={f.rate_per_night} onChange={(e) => setF({ ...f, rate_per_night: Number(e.target.value) })} /></div>
