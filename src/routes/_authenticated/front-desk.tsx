@@ -39,7 +39,7 @@ function FrontDesk() {
     e.preventDefault();
     if (!f.guest_name || !f.room_no || c.nights < 1) { setMsg("Fill guest, room and valid dates."); return; }
     setSaving(true); setMsg("");
-    const { error } = await supabase.from("stays").insert({ ...f, amount_paid: f.payment_method === "Pending" ? 0 : f.amount_paid });
+    const { error } = await supabase.from("stays").insert({ ...f, phone: f.phone || null, guest_requests: f.guest_requests || null, amount_paid: f.payment_method === "Pending" ? 0 : f.amount_paid });
     if (!error) await supabase.from("rooms").update({ status: "Occupied" }).eq("room_no", f.room_no);
     setSaving(false);
     if (error) { setMsg(error.message); return; }
@@ -150,7 +150,7 @@ function FrontDesk() {
 }
 
 function EditStay({ stay, onClose, onSaved }: { stay: Stay; onClose: () => void; onSaved: () => void }) {
-  const [f, setF] = useState({ guest_name: stay.guest_name, check_in: stay.check_in, check_out: stay.check_out, rate_per_night: stay.rate_per_night, laundry_cost: stay.laundry_cost, payment_method: stay.payment_method });
+  const [f, setF] = useState({ guest_name: stay.guest_name, phone: stay.phone ?? "", guest_requests: stay.guest_requests ?? "", check_in: stay.check_in, check_out: stay.check_out, rate_per_night: stay.rate_per_night, laundry_cost: stay.laundry_cost, payment_method: stay.payment_method });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const c = calcStay({ ...f, amount_paid: stay.amount_paid });
