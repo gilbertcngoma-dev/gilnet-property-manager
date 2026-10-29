@@ -43,6 +43,13 @@
       "when": 1793245461390,
       "tag": "0005_add_guest_contact_to_stays",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793245996026,
+      "tag": "0006_add_department_roles",
+      "breakpoints": true
     }
   ]
 }
