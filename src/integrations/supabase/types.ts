@@ -109,6 +109,7 @@ export type Database = {
           phone: string | null
           rate_per_night: number
           room_no: string
+          status: string
         }
         Insert: {
           amount_paid?: number
@@ -123,6 +124,7 @@ export type Database = {
           phone?: string | null
           rate_per_night?: number
           room_no: string
+          status?: string
         }
         Update: {
           amount_paid?: number
@@ -137,6 +139,7 @@ export type Database = {
           phone?: string | null
           rate_per_night?: number
           room_no?: string
+          status?: string
         }
         Relationships: []
       }

@@ -50,10 +50,13 @@
     "@tanstack/react-router": "1.170.41",
     "@tanstack/react-start": "1.168.60",
     "@tanstack/router-plugin": "1.168.42",
+    "@tanstack/zod-adapter": "^1.167.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dexie": "^4.4.7",
+    "dexie-react-hooks": "^4.4.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
@@ -96,6 +99,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5",
+    "vite-plugin-pwa": "^2.0.0",
     "vitest": "^4.1.10"
   }
 }
