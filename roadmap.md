@@ -11,3 +11,8 @@
 - [x] Add Excel report download on Reports (verified: valid .xlsx with Stays, Revenue by type, Payments, Laundry sheets).
 - [x] Add guest phone and guest requests to check-in/edit forms and guest lists.
 - [x] Add Upcoming reservations and Check-out history sections to Dashboard (verified in signed-in preview).
+- [x] Add booking status (Confirmed/Pending/Checked-in) to stays with 3 sample bookings.
+- [x] Reservations page: search, All/Today/Upcoming pills, booking cards, New Booking button, card click pre-fills Front Desk.
+- [x] Dashboard room cards: Assign Guest (vacant → Front Desk pre-selected) and View Reservation (occupied → Reservations).
+- [x] Offline mode: service worker (published app only), offline banner with queued count, check-ins saved locally and synced when back online.
+- [ ] Department-scoped access (housekeeping sees rooms only, restaurant adds sales only) — paused from earlier request; roles exist in DB, UI and policies not built.
