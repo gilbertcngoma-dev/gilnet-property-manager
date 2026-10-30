@@ -9,6 +9,8 @@ export type Room = {
   floor: number;
 };
 
+export type StayStatus = "Confirmed" | "Pending" | "Checked-in";
+
 export type Stay = {
   id: string;
   guest_name: string;
@@ -21,6 +23,7 @@ export type Stay = {
   payment_method: "Cash" | "Mobile" | "Visa/Card" | "Compliment" | "Pending" | "Airtel" | "Bank";
   phone: string | null;
   guest_requests: string | null;
+  status: StayStatus;
 };
 
 export const PAYMENT_METHODS = ["Cash", "Mobile", "Visa/Card", "Compliment", "Pending"] as const;
@@ -42,6 +45,20 @@ export function upcomingReservations(stays: Stay[], today: string) {
 export function checkoutHistory(stays: Stay[], today: string) {
   return stays.filter((s) => s.check_out < today)
     .sort((a, b) => b.check_out.localeCompare(a.check_out));
+}
+
+export type ReservationPill = "All" | "Today" | "Upcoming";
+
+export function filterReservations(stays: Stay[], pill: ReservationPill, query: string, today: string) {
+  const q = query.trim().toLowerCase();
+  return stays
+    .filter((s) => {
+      if (pill === "Today" && !(s.check_in <= today && s.check_out >= today)) return false;
+      if (pill === "Upcoming" && s.check_in <= today) return false;
+      if (q && !(s.guest_name.toLowerCase().includes(q) || s.room_no.toLowerCase().includes(q) || s.status.toLowerCase().includes(q))) return false;
+      return true;
+    })
+    .sort((a, b) => a.check_in.localeCompare(b.check_in));
 }
 
 export function nightsBetween(checkIn: string, checkOut: string) {
