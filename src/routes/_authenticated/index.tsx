@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { calcStay, checkoutHistory, kwacha, roomsQuery, staysQuery, todayISO, upcomingReservations, type Stay } from "@/lib/lodge";
+import { calcStay, checkoutHistory, kwacha, roomsQuery, staysQuery, todayISO, upcomingReservations, type Room, type Stay } from "@/lib/lodge";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -50,6 +50,12 @@ function Dashboard() {
         <List title="Today's check-ins" items={ins} />
         <List title="Today's check-outs" items={outs} />
       </div>
+      <div className="card">
+        <h2 className="mb-3 text-lg font-semibold">Rooms</h2>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          {rooms.map((r) => <RoomCard key={r.id} room={r} />)}
+        </div>
+      </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="card">
           <h2 className="mb-3 text-lg font-semibold">Upcoming reservations</h2>
@@ -78,6 +84,26 @@ function Dashboard() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+const DOT: Record<Room["status"], string> = { Vacant: "bg-vacant", Occupied: "bg-occupied", Cleaning: "bg-cleaning" };
+
+function RoomCard({ room }: { room: Room }) {
+  return (
+    <div className="rounded-lg border p-2 text-center text-sm">
+      <div className="flex items-center justify-center gap-1.5 font-semibold">
+        <span className={`inline-block h-2.5 w-2.5 rounded-full ${DOT[room.status]}`} />
+        Room {room.room_no}
+      </div>
+      <div className="text-xs text-muted-foreground">{room.room_type} · {room.status}</div>
+      {room.status === "Vacant" && (
+        <Link to="/front-desk" search={{ guest: "", room: room.room_no, in: "", out: "", rate: 0 }} className="btn-ghost mt-2 w-full justify-center">Assign Guest</Link>
+      )}
+      {room.status === "Occupied" && (
+        <Link to="/reservations" className="btn-ghost mt-2 w-full justify-center">View Reservation</Link>
+      )}
     </div>
   );
 }
