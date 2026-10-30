@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { InstallAppProvider } from "@/components/install-app";
+import { registerAppSW } from "@/lib/sw-register";
 
 function NotFoundComponent() {
   return (
@@ -92,6 +93,9 @@ function RootComponent() {
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
+  useEffect(() => {
+    registerAppSW();
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <InstallAppProvider><Outlet /></InstallAppProvider>

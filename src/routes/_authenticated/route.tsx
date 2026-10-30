@@ -1,8 +1,11 @@
 import { Link, Outlet, createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { myRolesQuery } from "@/lib/lodge";
+import { processSyncQueue, usePendingCount } from "@/lib/offline";
 import { InstallAppButton } from "@/components/install-app";
+import { OfflineBanner } from "@/components/offline-banner";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -17,6 +20,7 @@ export const Route = createFileRoute("/_authenticated")({
 const nav = [
   { to: "/", label: "Dashboard" },
   { to: "/front-desk", label: "Front Desk" },
+  { to: "/reservations", label: "Reservations" },
   { to: "/rooms", label: "Rooms" },
   { to: "/restaurant", label: "Restaurant" },
   { to: "/reports", label: "Reports" },
@@ -24,8 +28,20 @@ const nav = [
 
 function Layout() {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const { userId } = Route.useRouteContext();
   const { data: roles, isLoading } = useQuery(myRolesQuery(userId));
+  const pending = usePendingCount();
+
+  useEffect(() => {
+    const sync = () => {
+      void processSyncQueue().then((n) => {
+        if (n > 0) qc.invalidateQueries();
+      });
+    };
+    window.addEventListener("online", sync);
+    return () => window.removeEventListener("online", sync);
+  }, [qc]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -66,6 +82,9 @@ function Layout() {
               className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium opacity-80 hover:opacity-100"
               activeProps={{ className: "bg-primary text-primary-foreground opacity-100" }}>
               {n.label}
+              {n.to === "/reservations" && pending > 0 && (
+                <span className="ml-1.5 inline-flex items-center rounded-full bg-cleaning px-1.5 text-xs font-bold text-sidebar">{pending}</span>
+              )}
             </Link>
           ))}
           {isAdmin && (
@@ -82,7 +101,10 @@ function Layout() {
         </nav>
         <div className="border-t border-sidebar-foreground/20 px-3 py-2"><InstallAppButton /></div>
       </aside>
-      <main className="flex-1 p-4 md:p-8"><Outlet /></main>
+      <div className="flex flex-1 flex-col">
+        <OfflineBanner />
+        <main className="flex-1 p-4 md:p-8"><Outlet /></main>
+      </div>
     </div>
   );
 }
