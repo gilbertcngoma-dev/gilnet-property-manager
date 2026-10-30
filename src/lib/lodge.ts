@@ -9,6 +9,8 @@ export type Room = {
   floor: number;
 };
 
+export type StayStatus = "Confirmed" | "Pending" | "Checked-in";
+
 export type Stay = {
   id: string;
   guest_name: string;
@@ -18,9 +20,10 @@ export type Stay = {
   rate_per_night: number;
   laundry_cost: number;
   amount_paid: number;
-  payment_method: "Cash" | "Mobile" | "Visa/Card" | "Compliment" | "Pending" | "Airtel" | "Bank";
+  payment_method: "Cash" | "Mobile" "Visa/Card" | "Compliment" | "Pending" | "Airtel" | "Bank";
   phone: string | null;
   guest_requests: string | null;
+  status: StayStatus;
 };
 
 export const PAYMENT_METHODS = ["Cash", "Mobile", "Visa/Card", "Compliment", "Pending"] as const;
