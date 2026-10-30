@@ -1,10 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { insertStayOfflineFirst, updateRoomOfflineFirst } from "@/lib/offline";
 import { PAYMENT_METHODS, calcStay, kwacha, roomsQuery, staysQuery, todayISO, type Stay } from "@/lib/lodge";
 
+const frontDeskSearchSchema = z.object({
+  guest: fallback(z.string(), "").default(""),
+  room: fallback(z.string(), "").default(""),
+  in: fallback(z.string(), "").default(""),
+  out: fallback(z.string(), "").default(""),
+  rate: fallback(z.number(), 0).default(0),
+});
+
 export const Route = createFileRoute("/_authenticated/front-desk")({
+  validateSearch: zodValidator(frontDeskSearchSchema),
   head: () => ({
     meta: [
       { title: "Front Desk — Lodge Manager" },
@@ -26,8 +38,16 @@ function FrontDesk() {
   const qc = useQueryClient();
   const rooms = useQuery(roomsQuery).data ?? [];
   const stays = useQuery(staysQuery).data ?? [];
+  const search = Route.useSearch();
   const blank = { guest_name: "", phone: "", guest_requests: "", check_in: todayISO(), check_out: tomorrow(), room_no: "", rate_per_night: 0, laundry_cost: 0, amount_paid: 0, payment_method: "Cash" as Stay["payment_method"] };
-  const [f, setF] = useState(blank);
+  const [f, setF] = useState(() => ({
+    ...blank,
+    guest_name: search.guest || "",
+    room_no: search.room || "",
+    check_in: search.in || todayISO(),
+    check_out: search.out || tomorrow(),
+    rate_per_night: search.rate || 0,
+  }));
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [panel, setPanel] = useState<Panel>(null);
@@ -39,11 +59,12 @@ function FrontDesk() {
     e.preventDefault();
     if (!f.guest_name || !f.room_no || c.nights < 1) { setMsg("Fill guest, room and valid dates."); return; }
     setSaving(true); setMsg("");
-    const { error } = await supabase.from("stays").insert({ ...f, phone: f.phone || null, guest_requests: f.guest_requests || null, amount_paid: f.payment_method === "Pending" ? 0 : f.amount_paid });
-    if (!error) await supabase.from("rooms").update({ status: "Occupied" }).eq("room_no", f.room_no);
+    const result = await insertStayOfflineFirst({ ...f, phone: f.phone || null, guest_requests: f.guest_requests || null, amount_paid: f.payment_method === "Pending" ? 0 : f.amount_paid, status: "Checked-in" });
+    await updateRoomOfflineFirst(f.room_no, "Occupied");
     setSaving(false);
-    if (error) { setMsg(error.message); return; }
-    setF(blank); setMsg("Guest checked in."); refresh();
+    setF(blank);
+    setMsg(result.queued ? "Saved offline — will sync when online." : "Guest checked in.");
+    refresh();
   }
 
   async function checkout(s: Stay) {

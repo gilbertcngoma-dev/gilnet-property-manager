@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedFrontDeskRouteImport } from './routes/_authenticated/front-desk'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedReservationsRouteImport } from './routes/_authenticated/reservations'
 import { Route as AuthenticatedRestaurantRouteImport } from './routes/_authenticated/restaurant'
 import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated/rooms'
 import { Route as AuthenticatedStaffRouteImport } from './routes/_authenticated/staff'
@@ -48,6 +49,12 @@ const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReservationsRoute =
+  AuthenticatedReservationsRouteImport.update({
+    id: '/reservations',
+    path: '/reservations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRestaurantRoute = AuthenticatedRestaurantRouteImport.update({
   id: '/restaurant',
   path: '/restaurant',
@@ -70,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/front-desk': typeof AuthenticatedFrontDeskRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/reservations': typeof AuthenticatedReservationsRoute
   '/restaurant': typeof AuthenticatedRestaurantRoute
   '/rooms': typeof AuthenticatedRoomsRoute
   '/staff': typeof AuthenticatedStaffRoute
@@ -79,6 +87,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/front-desk': typeof AuthenticatedFrontDeskRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/reservations': typeof AuthenticatedReservationsRoute
   '/restaurant': typeof AuthenticatedRestaurantRoute
   '/rooms': typeof AuthenticatedRoomsRoute
   '/staff': typeof AuthenticatedStaffRoute
@@ -91,6 +100,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/front-desk': typeof AuthenticatedFrontDeskRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/reservations': typeof AuthenticatedReservationsRoute
   '/_authenticated/restaurant': typeof AuthenticatedRestaurantRoute
   '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
   '/_authenticated/staff': typeof AuthenticatedStaffRoute
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/front-desk'
     | '/reports'
+    | '/reservations'
     | '/restaurant'
     | '/rooms'
     | '/staff'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/front-desk'
     | '/reports'
+    | '/reservations'
     | '/restaurant'
     | '/rooms'
     | '/staff'
@@ -124,6 +136,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/front-desk'
     | '/_authenticated/reports'
+    | '/_authenticated/reservations'
     | '/_authenticated/restaurant'
     | '/_authenticated/rooms'
     | '/_authenticated/staff'
@@ -180,6 +193,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reservations': {
+      id: '/_authenticated/reservations'
+      path: '/reservations'
+      fullPath: '/reservations'
+      preLoaderRoute: typeof AuthenticatedReservationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/restaurant': {
       id: '/_authenticated/restaurant'
       path: '/restaurant'
@@ -207,6 +227,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedFrontDeskRoute: typeof AuthenticatedFrontDeskRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedReservationsRoute: typeof AuthenticatedReservationsRoute
   AuthenticatedRestaurantRoute: typeof AuthenticatedRestaurantRoute
   AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
   AuthenticatedStaffRoute: typeof AuthenticatedStaffRoute
@@ -216,6 +237,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFrontDeskRoute: AuthenticatedFrontDeskRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedReservationsRoute: AuthenticatedReservationsRoute,
   AuthenticatedRestaurantRoute: AuthenticatedRestaurantRoute,
   AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
   AuthenticatedStaffRoute: AuthenticatedStaffRoute,
