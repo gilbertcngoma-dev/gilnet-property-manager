@@ -142,3 +142,16 @@ export const MENU_ITEMS = [
 ] as const;
 
 export const ROOM_SERVICE_CHARGE_ITEM = "Room service charge";
+
+/** Pages each department may open. Admin and front-office staff see everything. */
+export const DEPARTMENT_PAGES: Record<AppRole, readonly string[] | "all"> = {
+  admin: "all",
+  staff: "all",
+  housekeeping: ["/rooms"],
+  restaurant: ["/restaurant"],
+};
+
+export function allowedPages(roles: readonly AppRole[]): "all" | string[] {
+  if (roles.some((r) => DEPARTMENT_PAGES[r] === "all")) return "all";
+  return [...new Set(roles.flatMap((r) => DEPARTMENT_PAGES[r] as readonly string[]))];
+}
