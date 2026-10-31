@@ -3,7 +3,7 @@ import { calcStay, PAYMENT_METHODS, canExtendStay, upcomingReservations, checkou
 
 const stay = (over: Partial<Stay>): Stay => ({
   id: "x", guest_name: "G", check_in: "2026-10-20", check_out: "2026-10-22", room_no: "01",
-  rate_per_night: 0, laundry_cost: 0, amount_paid: 0, payment_method: "Cash", phone: null, guest_requests: null, ...over,
+  rate_per_night: 0, laundry_cost: 0, amount_paid: 0, payment_method: "Cash", phone: null, guest_requests: null, status: "Confirmed", ...over,
 });
 
 describe("calcStay", () => {
