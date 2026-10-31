@@ -1,8 +1,8 @@
-import { Link, Outlet, createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { Link, Navigate, Outlet, createFileRoute, redirect, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { myRolesQuery } from "@/lib/lodge";
+import { allowedPages, myRolesQuery } from "@/lib/lodge";
 import { processSyncQueue, usePendingCount } from "@/lib/offline";
 import { InstallAppButton } from "@/components/install-app";
 import { OfflineBanner } from "@/components/offline-banner";
@@ -32,6 +32,7 @@ function Layout() {
   const { userId } = Route.useRouteContext();
   const { data: roles, isLoading } = useQuery(myRolesQuery(userId));
   const pending = usePendingCount();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const sync = () => {
@@ -68,16 +69,21 @@ function Layout() {
   }
 
   const isAdmin = roles.includes("admin");
+  const pages = allowedPages(roles);
+  const visibleNav = pages === "all" ? nav : nav.filter((n) => pages.includes(n.to));
+  if (pages !== "all" && !pages.includes(pathname)) {
+    return <Navigate to={pages[0] as "/rooms"} replace />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
       <aside className="bg-sidebar text-sidebar-foreground md:w-56 md:shrink-0">
         <div className="p-5">
           <div className="font-display text-xl font-bold">Lodge Manager</div>
-          <div className="text-xs opacity-70">Front office</div>
+          <div className="text-xs opacity-70">{pages === "all" ? "Front office" : roles.includes("housekeeping") ? "Housekeeping" : "Restaurant"}</div>
         </div>
         <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col">
-          {nav.map((n) => (
+          {visibleNav.map((n) => (
             <Link key={n.to} to={n.to} activeOptions={{ exact: true }}
               className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium opacity-80 hover:opacity-100"
               activeProps={{ className: "bg-primary text-primary-foreground opacity-100" }}>

@@ -101,7 +101,7 @@ export const staysQuery = queryOptions({
   },
 });
 
-export type AppRole = "admin" | "staff";
+export type AppRole = "admin" | "staff" | "housekeeping" | "restaurant";
 
 export type Profile = { id: string; email: string | null; created_at: string };
 
