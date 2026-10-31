@@ -57,6 +57,13 @@
       "when": 1793330225077,
       "tag": "0007_add_stay_status_and_sample_bookings",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793405240966,
+      "tag": "0008_department_access",
+      "breakpoints": true
     }
   ]
 }
