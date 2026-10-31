@@ -31,10 +31,11 @@ export function getDb() {
 }
 
 async function push(item: QueuedWrite) {
-  const table = supabase.from(item.table);
-  return item.op === "insert"
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const table = supabase.from(item.table) as any;
+  return (item.op === "insert"
     ? table.insert(item.payload)
-    : table.update(item.payload).match(item.match ?? {});
+    : table.update(item.payload).match(item.match ?? {})) as Promise<{ error: unknown }>;
 }
 
 /** Process queued writes in order (last-write-wins by queue order). Returns number synced. */
@@ -62,7 +63,7 @@ export async function insertStayOfflineFirst(row: Record<string, unknown>) {
     await enqueue();
     return { queued: true as const, id };
   }
-  const { error } = await supabase.from("stays").insert(local);
+  const { error } = await supabase.from("stays").insert(local as never);
   if (error) {
     await enqueue();
     return { queued: true as const, id };
