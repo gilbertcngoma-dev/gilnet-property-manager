@@ -43,6 +43,16 @@ function StaffPage() {
     onSuccess: refresh,
   });
 
+  const changeRole = useMutation({
+    mutationFn: async ({ userId: uid, role }: { userId: string; role: AppRole }) => {
+      const del = await supabase.from("user_roles").delete().eq("user_id", uid);
+      if (del.error) throw del.error;
+      const { error } = await supabase.from("user_roles").insert({ user_id: uid, role });
+      if (error) throw error;
+    },
+    onSuccess: refresh,
+  });
+
   const remove = useMutation({
     mutationFn: async (uid: string) => {
       const { error } = await supabase.from("user_roles").delete().eq("user_id", uid);
@@ -64,7 +74,7 @@ function StaffPage() {
       <div>
         <h1 className="font-display text-2xl font-bold">Staff access</h1>
         <p className="text-sm text-muted-foreground">
-          New accounts can sign in only after you approve them here. Removing access signs them out of the data immediately.
+          New accounts can sign in only after you approve them here. Choose each person's department to control what they can see. Removing access signs them out of the data immediately.
         </p>
       </div>
       <CreateStaff onDone={refresh} />
@@ -89,9 +99,15 @@ function StaffPage() {
                   <td className="p-3">{new Date(p.created_at).toLocaleDateString()}</td>
                   <td className="p-3">
                     {approved ? (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium">
-                        {r.includes("admin") ? "Admin" : "Staff"}
-                      </span>
+                      r.includes("admin") ? (
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium">Manager</span>
+                      ) : (
+                        <select aria-label={`Department for ${p.email}`} className="field w-auto py-1 text-xs" value={r[0]}
+                          disabled={changeRole.isPending}
+                          onChange={(e) => changeRole.mutate({ userId: p.id, role: e.target.value as AppRole })}>
+                          {DEPARTMENTS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+                        </select>
+                      )
                     ) : (
                       <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium">Pending</span>
                     )}
@@ -123,6 +139,12 @@ function StaffPage() {
     </div>
   );
 }
+
+const DEPARTMENTS: { value: AppRole; label: string }[] = [
+  { value: "staff", label: "Front office (everything)" },
+  { value: "housekeeping", label: "Housekeeping (rooms only)" },
+  { value: "restaurant", label: "Restaurant (sales only)" },
+];
 
 function CreateStaff({ onDone }: { onDone: () => void }) {
   const create = useServerFn(createStaffAccount);

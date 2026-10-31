@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calcStay, PAYMENT_METHODS, canExtendStay, upcomingReservations, checkoutHistory, type Stay } from "./lodge";
+import { calcStay, PAYMENT_METHODS, canExtendStay, upcomingReservations, checkoutHistory, type Stay , allowedPages } from "./lodge";
 
 const stay = (over: Partial<Stay>): Stay => ({
   id: "x", guest_name: "G", check_in: "2026-10-20", check_out: "2026-10-22", room_no: "01",
@@ -50,4 +50,11 @@ it("lists only past check-outs as history, most recent first", () => {
     stay({ id: "leaving-today", check_in: "2026-10-27", check_out: "2026-10-29" }),
   ];
   expect(checkoutHistory(stays, today).map((s) => s.id)).toEqual(["recent", "old"]);
+});
+
+it("limits departments to their own pages", () => {
+  expect(allowedPages(["housekeeping"])).toEqual(["/rooms"]);
+  expect(allowedPages(["restaurant"])).toEqual(["/restaurant"]);
+  expect(allowedPages(["staff"])).toBe("all");
+  expect(allowedPages(["admin", "restaurant"])).toBe("all");
 });
