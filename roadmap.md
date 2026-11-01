@@ -15,4 +15,4 @@
 - [x] Reservations page: search, All/Today/Upcoming pills, booking cards, New Booking button, card click pre-fills Front Desk.
 - [x] Dashboard room cards: Assign Guest (vacant → Front Desk pre-selected) and View Reservation (occupied → Reservations).
 - [x] Offline mode: service worker (published app only), offline banner with queued count, check-ins saved locally and synced when back online.
-- [ ] Department-scoped access (housekeeping sees rooms only, restaurant adds sales only) — paused from earlier request; roles exist in DB, UI and policies not built.
+- [x] Department-scoped access (housekeeping sees rooms only, restaurant adds sales only); Extend stay hidden for housekeeping.
