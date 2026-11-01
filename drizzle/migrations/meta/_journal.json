@@ -64,6 +64,13 @@
       "when": 1793405240966,
       "tag": "0008_department_access",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793491873994,
+      "tag": "0009_reservation_status_receipt",
+      "breakpoints": true
     }
   ]
 }
