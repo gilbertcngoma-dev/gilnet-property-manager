@@ -1,8 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 import { BedDouble, CalendarDays, Plus, Search } from "lucide-react";
-import { calcStay, filterReservations, kwacha, roomsQuery, staysQuery, todayISO, type ReservationPill, type Stay } from "@/lib/lodge";
+import { calcStay, filterReservations, kwacha, roomsQuery, staysQuery, todayISO, type ReservationPill, type Stay, STATUS_FILTERS, type StatusFilter } from "@/lib/lodge";
 
 export const Route = createFileRoute("/_authenticated/reservations")({
   head: () => ({
@@ -15,6 +18,7 @@ export const Route = createFileRoute("/_authenticated/reservations")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: zodValidator(z.object({ status: fallback(z.string(), "All").default("All") })),
   component: Reservations,
 });
 
@@ -24,7 +28,11 @@ const BADGE: Record<Stay["status"], string> = {
   Confirmed: "badge-confirmed",
   Pending: "badge-pending",
   "Checked-in": "badge-checkedin",
+  Cancelled: "badge",
+  "Later Date": "badge-pending",
 };
+
+const STATUS_KEY = "reservations-status-filter";
 
 function Reservations() {
   const rooms = useQuery(roomsQuery).data ?? [];
@@ -33,7 +41,25 @@ function Reservations() {
   const [pill, setPill] = useState<ReservationPill>("All");
   const today = todayISO();
   const roomByNo = new Map(rooms.map((r) => [r.room_no, r]));
-  const list = filterReservations(stays, pill, q, today);
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/reservations" });
+  const qc = useQueryClient();
+  const status: StatusFilter = (STATUS_FILTERS as readonly string[]).includes(search.status) ? (search.status as StatusFilter) : "All";
+  useEffect(() => {
+    const saved = localStorage.getItem(STATUS_KEY);
+    if (search.status === "All" && saved && saved !== "All" && (STATUS_FILTERS as readonly string[]).includes(saved)) navigate({ search: { status: saved }, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const setStatus = (v: string) => { localStorage.setItem(STATUS_KEY, v); navigate({ search: { status: v }, replace: true }); };
+  const [receiptFor, setReceiptFor] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState("");
+  async function saveReceipt(id: string) {
+    const { error } = await supabase.from("stays").update({ receipt_no: receipt.trim() || null }).eq("id", id);
+    if (error) { alert(error.message); return; }
+    setReceiptFor(null);
+    await qc.invalidateQueries({ queryKey: ["stays"] });
+  }
+  const list = filterReservations(stays, pill, q, today, status);
 
   return (
     <div className="space-y-6">
@@ -52,10 +78,16 @@ function Reservations() {
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <input
             className="field pl-9"
-            placeholder="Search guests, room, or booking"
+            placeholder="Search guests, room, booking or receipt no."
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
+        </div>
+        <div className="flex items-center gap-2">
+          <label htmlFor="status-filter" className="text-sm font-medium whitespace-nowrap">Reservation Status</label>
+          <select id="status-filter" className="field w-40" value={status} onChange={(e) => setStatus(e.target.value)}>
+            {STATUS_FILTERS.map((o) => <option key={o}>{o}</option>)}
+          </select>
         </div>
         <div className="flex gap-2">
           {PILLS.map((p) => (
@@ -79,11 +111,11 @@ function Reservations() {
             const k = calcStay(s);
             const room = roomByNo.get(s.room_no);
             return (
+              <div key={s.id} className="card space-y-2 transition-shadow hover:shadow-md">
               <Link
-                key={s.id}
                 to="/front-desk"
                 search={{ guest: s.guest_name, room: s.room_no, in: s.check_in, out: s.check_out, rate: s.rate_per_night }}
-                className="card block space-y-2 transition-shadow hover:shadow-md"
+                className="block space-y-2"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-semibold">{s.guest_name}</span>
@@ -103,7 +135,23 @@ function Reservations() {
                 <div className="text-xs text-muted-foreground">
                   Check-in: {s.check_in} · Payment: {s.payment_method}
                 </div>
+                <div className="text-sm">
+                  <span className="font-medium">Booking Down Payment:</span> {kwacha(Number(s.amount_paid))} paid / {kwacha(k.balance)} balance
+                </div>
+                {s.receipt_no && <div className="text-sm"><span className="font-medium">Receipt No:</span> {s.receipt_no}</div>}
               </Link>
+              {s.status === "Checked-in" && (receiptFor === s.id ? (
+                <div className="flex gap-2">
+                  <input aria-label="Receipt number" className="field" value={receipt} onChange={(e) => setReceipt(e.target.value)} placeholder="Receipt number" maxLength={50} />
+                  <button type="button" className="btn" onClick={() => saveReceipt(s.id)}>Save</button>
+                  <button type="button" className="btn-ghost" onClick={() => setReceiptFor(null)}>Cancel</button>
+                </div>
+              ) : (
+                <button type="button" className="btn-ghost text-sm" onClick={() => { setReceiptFor(s.id); setReceipt(s.receipt_no ?? ""); }}>
+                  {s.receipt_no ? "Edit receipt number" : "Add receipt number"}
+                </button>
+              ))}
+              </div>
             );
           })}
         </div>

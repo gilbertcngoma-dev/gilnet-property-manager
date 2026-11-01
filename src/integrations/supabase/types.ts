@@ -108,6 +108,7 @@ export type Database = {
           payment_method: string
           phone: string | null
           rate_per_night: number
+          receipt_no: string | null
           room_no: string
           status: string
         }
@@ -123,6 +124,7 @@ export type Database = {
           payment_method?: string
           phone?: string | null
           rate_per_night?: number
+          receipt_no?: string | null
           room_no: string
           status?: string
         }
@@ -138,6 +140,7 @@ export type Database = {
           payment_method?: string
           phone?: string | null
           rate_per_night?: number
+          receipt_no?: string | null
           room_no?: string
           status?: string
         }
