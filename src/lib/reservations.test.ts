@@ -48,3 +48,15 @@ describe("filterReservations", () => {
     expect(filterReservations(sample, "All", "nobody", TODAY)).toEqual([]);
   });
 });
+
+import { filterReservations as fr } from "./lodge";
+import { describe as d2, it as i2, expect as e2 } from "vitest";
+d2("reservation status filter and receipt search", () => {
+  const base = { check_in: "2026-11-05", check_out: "2026-11-06", rate_per_night: 0, laundry_cost: 0, amount_paid: 0, payment_method: "Cash" as const, phone: null, guest_requests: null };
+  const rows = [
+    { ...base, id: "1", guest_name: "A", room_no: "01", status: "Cancelled" as const },
+    { ...base, id: "2", guest_name: "B", room_no: "02", status: "Checked-in" as const, receipt_no: "R-778" },
+  ];
+  i2("shows only Cancelled when Cancelled is chosen", () => { e2(fr(rows, "All", "", "2026-11-01", "Cancelled").map((r) => r.id)).toEqual(["1"]); });
+  i2("finds a booking by receipt number", () => { e2(fr(rows, "All", "r-778", "2026-11-01").map((r) => r.id)).toEqual(["2"]); });
+});
