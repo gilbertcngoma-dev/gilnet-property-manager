@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { roomsQuery, staysQuery, todayISO, calcStay, kwacha, canExtendStay, currentStayForRoom, type Room, type Stay } from "@/lib/lodge";
+import { roomsQuery, staysQuery, todayISO, calcStay, kwacha, canExtendStay, currentStayForRoom, myRolesQuery, allowedPages, type Room, type Stay } from "@/lib/lodge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/rooms")({
@@ -28,6 +28,9 @@ const next: Record<Room["status"], Room["status"]> = { Vacant: "Occupied", Occup
 
 function Rooms() {
   const qc = useQueryClient();
+  const { userId } = Route.useRouteContext();
+  const myRoles = useQuery(myRolesQuery(userId)).data ?? [];
+  const frontOffice = allowedPages(myRoles) === "all";
   const rooms = useQuery(roomsQuery).data ?? [];
   const stays = useQuery(staysQuery).data ?? [];
   const [extending, setExtending] = useState<Stay | null>(null);
@@ -77,7 +80,7 @@ function Rooms() {
             <div className="text-xs opacity-90">{r.room_type} · Floor {r.floor}</div>
             <div className="mt-2 text-sm font-semibold">{r.status}</div>
           </Button>
-          {guest && <><div className="mt-2 break-words text-xs">{guest.guest_name}<br />Until {guest.check_out}</div><Button variant="outline" size="sm" className="mt-3 w-full text-foreground" onClick={() => { setExtending(guest); setCheckout(guest.check_out); setMessage(""); }}>Extend stay</Button></>}
+          {guest && <><div className="mt-2 break-words text-xs">{guest.guest_name}<br />Until {guest.check_out}</div>{frontOffice && <Button variant="outline" size="sm" className="mt-3 w-full text-foreground" onClick={() => { setExtending(guest); setCheckout(guest.check_out); setMessage(""); }}>Extend stay</Button>}</>}
           </div>
         ); })}
       </div>
