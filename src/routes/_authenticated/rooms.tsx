@@ -1,3 +1,4 @@
+import { updateRoomOfflineFirst } from "@/lib/offline";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -52,7 +53,8 @@ function Rooms() {
   }
 
   async function cycle(r: Room) {
-    await supabase.from("rooms").update({ status: next[r.status] }).eq("id", r.id);
+    qc.setQueryData<Room[]>(["rooms"], (old) => old?.map((x) => x.id === r.id ? { ...x, status: next[r.status] } : x));
+    await updateRoomOfflineFirst(r.room_no, next[r.status]);
     qc.invalidateQueries({ queryKey: ["rooms"] });
   }
   async function add(e: React.FormEvent) {
