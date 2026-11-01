@@ -9,7 +9,9 @@ export type Room = {
   floor: number;
 };
 
-export type StayStatus = "Confirmed" | "Pending" | "Checked-in";
+export type StayStatus = "Confirmed" | "Pending" | "Checked-in" | "Cancelled" | "Later Date";
+export const STATUS_FILTERS = ["All", "Confirmed", "Pending", "Cancelled", "Later Date"] as const;
+export type StatusFilter = (typeof STATUS_FILTERS)[number];
 
 export type Stay = {
   id: string;
@@ -24,6 +26,7 @@ export type Stay = {
   phone: string | null;
   guest_requests: string | null;
   status: StayStatus;
+  receipt_no?: string | null;
 };
 
 export const PAYMENT_METHODS = ["Cash", "Mobile", "Visa/Card", "Compliment", "Pending"] as const;
@@ -49,13 +52,14 @@ export function checkoutHistory(stays: Stay[], today: string) {
 
 export type ReservationPill = "All" | "Today" | "Upcoming";
 
-export function filterReservations(stays: Stay[], pill: ReservationPill, query: string, today: string) {
+export function filterReservations(stays: Stay[], pill: ReservationPill, query: string, today: string, status: StatusFilter = "All") {
   const q = query.trim().toLowerCase();
   return stays
     .filter((s) => {
       if (pill === "Today" && !(s.check_in <= today && s.check_out >= today)) return false;
       if (pill === "Upcoming" && s.check_in <= today) return false;
-      if (q && !(s.guest_name.toLowerCase().includes(q) || s.room_no.toLowerCase().includes(q) || s.status.toLowerCase().includes(q))) return false;
+      if (status !== "All" && s.status !== status) return false;
+      if (q && !(s.guest_name.toLowerCase().includes(q) || s.room_no.toLowerCase().includes(q) || s.status.toLowerCase().includes(q) || (s.receipt_no ?? "").toLowerCase().includes(q))) return false;
       return true;
     })
     .sort((a, b) => a.check_in.localeCompare(b.check_in));
