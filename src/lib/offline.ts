@@ -104,3 +104,12 @@ export function useOnlineStatus() {
 export function usePendingCount() {
   return useLiveQuery(() => getDb().syncQueue.count(), [], 0) ?? 0;
 }
+
+/** Generic write: tries the server, queues it when offline or failing. */
+export async function writeOfflineFirst(item: Omit<QueuedWrite, "created_at" | "id">) {
+  const enqueue = () => getDb().syncQueue.add({ ...item, created_at: Date.now() });
+  if (!navigator.onLine) { await enqueue(); return { queued: true as const }; }
+  const { error } = await push({ ...item, created_at: Date.now() });
+  if (error) { await enqueue(); return { queued: true as const }; }
+  return { queued: false as const };
+}

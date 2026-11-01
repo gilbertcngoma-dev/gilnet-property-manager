@@ -1,3 +1,4 @@
+import { writeOfflineFirst } from "@/lib/offline";
 import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -60,10 +61,10 @@ function Restaurant() {
     setSaving(true);
     const rows = [{ ...f, room_no: f.room_no.trim() || null }];
     if (f.service_type === "Room service" && charge > 0) rows.push({ ...f, item: ROOM_SERVICE_CHARGE_ITEM, quantity: 1, unit_price: charge, room_no: f.room_no.trim() });
-    const { error } = await supabase.from("restaurant_sales").insert(rows);
+    const rowsWithId = rows.map((r) => ({ ...r, id: crypto.randomUUID() }));
+    const { queued } = await writeOfflineFirst({ table: "restaurant_sales", op: "insert", payload: rowsWithId as never });
     setSaving(false);
-    if (error) { setMessage(error.message); return; }
-    setMessage("Sale added.");
+    setMessage(queued ? "No internet — sale saved and will sync when online." : "Sale added.");
     setF({ ...blank, sale_date: f.sale_date });
     setCharge(0);
     qc.invalidateQueries({ queryKey: ["restaurant_sales"] });
