@@ -2,14 +2,14 @@ import { writeOfflineFirst } from "@/lib/offline";
 import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { local } from "@/lib/localdb";
 import { MENU_ITEMS, PAYMENT_METHODS, ROOM_NUMBERS, ROOM_SERVICE_CHARGE_ITEM, kwacha, todayISO } from "@/lib/lodge";
 import { Button } from "@/components/ui/button";
 
 export const restaurantQuery = queryOptions({
   queryKey: ["restaurant_sales"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("restaurant_sales").select("*").order("created_at", { ascending: false });
+    const { data, error } = await local.from("restaurant_sales").select("*").order("created_at", { ascending: false });
     if (error) throw error;
     return data;
   },
@@ -64,13 +64,13 @@ function Restaurant() {
     const rowsWithId = rows.map((r) => ({ ...r, id: crypto.randomUUID() }));
     const { queued } = await writeOfflineFirst({ table: "restaurant_sales", op: "insert", payload: rowsWithId as never });
     setSaving(false);
-    setMessage(queued ? "No internet — sale saved and will sync when online." : "Sale added.");
+    void queued; setMessage("Sale added.");
     setF({ ...blank, sale_date: f.sale_date });
     setCharge(0);
     qc.invalidateQueries({ queryKey: ["restaurant_sales"] });
   }
   async function remove(id: string) {
-    await supabase.from("restaurant_sales").delete().eq("id", id);
+    await local.from("restaurant_sales").delete().eq("id", id);
     qc.invalidateQueries({ queryKey: ["restaurant_sales"] });
   }
 
@@ -128,7 +128,7 @@ function EditSale({ sale, onClose, onSaved }: { sale: Sale; onClose: () => void;
     e.preventDefault();
     if (!f.item || (f.service_type === "Room service" && !f.room_no.trim())) { setMsg("Enter an item and a room number for room service."); return; }
     setSaving(true);
-    const { error } = await supabase.from("restaurant_sales").update({ ...f, room_no: f.room_no.trim() || null }).eq("id", sale.id);
+    const { error } = await local.from("restaurant_sales").update({ ...f, room_no: f.room_no.trim() || null }).eq("id", sale.id);
     setSaving(false);
     if (error) { setMsg(error.message); return; }
     onSaved();

@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { local } from "@/lib/localdb";
 
 export type Room = {
   id: string;
@@ -90,7 +90,7 @@ export const todayISO = () => {
 export const roomsQuery = queryOptions({
   queryKey: ["rooms"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("rooms").select("*").order("room_no");
+    const { data, error } = await local.from("rooms").select("*").order("room_no");
     if (error) throw error;
     return data as Room[];
   },
@@ -99,43 +99,13 @@ export const roomsQuery = queryOptions({
 export const staysQuery = queryOptions({
   queryKey: ["stays"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("stays").select("*").order("check_in", { ascending: false });
+    const { data, error } = await local.from("stays").select("*").order("check_in", { ascending: false });
     if (error) throw error;
     return data as Stay[];
   },
 });
 
 export type AppRole = "admin" | "staff" | "housekeeping" | "restaurant";
-
-export type Profile = { id: string; email: string | null; created_at: string };
-
-export const myRolesQuery = (userId: string) =>
-  queryOptions({
-    queryKey: ["my-roles", userId],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-      if (error) throw error;
-      return (data ?? []).map((r) => r.role as AppRole);
-    },
-  });
-
-export const profilesQuery = queryOptions({
-  queryKey: ["profiles"],
-  queryFn: async () => {
-    const { data, error } = await supabase.from("profiles").select("*").order("created_at");
-    if (error) throw error;
-    return data as Profile[];
-  },
-});
-
-export const allRolesQuery = queryOptions({
-  queryKey: ["all-roles"],
-  queryFn: async () => {
-    const { data, error } = await supabase.from("user_roles").select("*");
-    if (error) throw error;
-    return data as { id: string; user_id: string; role: AppRole }[];
-  },
-});
 
 export const ROOM_NUMBERS = Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(2, "0"));
 

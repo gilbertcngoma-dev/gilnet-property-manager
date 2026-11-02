@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { local } from "@/lib/localdb";
 import { insertStayOfflineFirst, updateRoomOfflineFirst } from "@/lib/offline";
 import { PAYMENT_METHODS, calcStay, kwacha, roomsQuery, staysQuery, todayISO, type Stay } from "@/lib/lodge";
 
@@ -63,18 +63,18 @@ function FrontDesk() {
     await updateRoomOfflineFirst(f.room_no, "Occupied");
     setSaving(false);
     setF(blank);
-    setMsg(result.queued ? "Saved offline — will sync when online." : "Guest checked in.");
+    void result; setMsg("Guest checked in.");
     refresh();
   }
 
   async function checkout(s: Stay) {
-    await supabase.from("rooms").update({ status: "Cleaning" }).eq("room_no", s.room_no);
-    if (s.check_out > todayISO()) await supabase.from("stays").update({ check_out: todayISO() }).eq("id", s.id);
+    await local.from("rooms").update({ status: "Cleaning" }).eq("room_no", s.room_no);
+    await local.from("stays").update(s.check_out > todayISO() ? { check_out: todayISO(), status: "Checked-out" } : { status: "Checked-out" }).eq("id", s.id);
     refresh();
   }
 
   async function updatePaid(s: Stay, amount: number) {
-    await supabase.from("stays").update({ amount_paid: amount }).eq("id", s.id);
+    await local.from("stays").update({ amount_paid: amount }).eq("id", s.id);
     refresh();
   }
 
@@ -173,7 +173,7 @@ function FrontDesk() {
 }
 
 function EditStay({ stay, onClose, onSaved }: { stay: Stay; onClose: () => void; onSaved: () => void }) {
-  const [f, setF] = useState({ guest_name: stay.guest_name, phone: stay.phone ?? "", guest_requests: stay.guest_requests ?? "", check_in: stay.check_in, check_out: stay.check_out, rate_per_night: stay.rate_per_night, laundry_cost: stay.laundry_cost, payment_method: stay.payment_method });
+  const [f, setF] = useState({ guest_name: stay.guest_name, phone: stay.phone ?? "", guest_requests: stay.guest_requests ?? "", check_in: stay.check_in, check_out: stay.check_out, rate_per_night: stay.rate_per_night, laundry_cost: stay.laundry_cost, payment_method: stay.payment_method, status: stay.status });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const c = calcStay({ ...f, amount_paid: stay.amount_paid });
@@ -182,7 +182,7 @@ function EditStay({ stay, onClose, onSaved }: { stay: Stay; onClose: () => void;
     e.preventDefault();
     if (!f.guest_name || c.nights < 1) { setMsg("Fill guest name and valid dates."); return; }
     setSaving(true);
-    const { error } = await supabase.from("stays").update({ ...f, phone: f.phone || null, guest_requests: f.guest_requests || null }).eq("id", stay.id);
+    const { error } = await local.from("stays").update({ ...f, phone: f.phone || null, guest_requests: f.guest_requests || null }).eq("id", stay.id);
     setSaving(false);
     if (error) { setMsg(error.message); return; }
     onSaved();
@@ -201,6 +201,11 @@ function EditStay({ stay, onClose, onSaved }: { stay: Stay; onClose: () => void;
       <div><label className="label">Payment method</label>
         <select className="field" value={f.payment_method} onChange={(e) => setF({ ...f, payment_method: e.target.value as Stay["payment_method"] })}>
           {PAYMENT_METHODS.map((m) => <option key={m}>{m}</option>)}
+        </select>
+      </div>
+      <div><label className="label">Booking status</label>
+        <select className="field" value={f.status} onChange={(e) => setF({ ...f, status: e.target.value as Stay["status"] })}>
+          {(["Confirmed", "Pending", "Checked-in", "Later Date", "Cancelled"] as const).map((m) => <option key={m}>{m}</option>)}
         </select>
       </div>
       <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-3 text-sm md:col-span-4 md:grid-cols-4">
@@ -227,7 +232,7 @@ function AddLaundry({ stay, onClose, onSaved }: { stay: Stay; onClose: () => voi
     e.preventDefault();
     if (amount <= 0) { setMsg("Enter an amount above 0."); return; }
     setSaving(true);
-    const { error } = await supabase.from("stays").update({ laundry_cost: Number(stay.laundry_cost) + amount }).eq("id", stay.id);
+    const { error } = await local.from("stays").update({ laundry_cost: Number(stay.laundry_cost) + amount }).eq("id", stay.id);
     setSaving(false);
     if (error) { setMsg(error.message); return; }
     onSaved();
@@ -255,7 +260,7 @@ function RoomService({ stay, onClose, onSaved }: { stay: Stay; onClose: () => vo
     e.preventDefault();
     if (!f.item || total <= 0) { setMsg("Enter an item and a price above 0."); return; }
     setSaving(true);
-    const { error } = await supabase.from("restaurant_sales").insert({ sale_date: todayISO(), item: f.item, quantity: f.quantity, unit_price: f.unit_price, room_no: stay.room_no, payment_method: "Pending", service_type: "Room service" });
+    const { error } = await local.from("restaurant_sales").insert({ sale_date: todayISO(), item: f.item, quantity: f.quantity, unit_price: f.unit_price, room_no: stay.room_no, payment_method: "Pending", service_type: "Room service" });
     setSaving(false);
     if (error) { setMsg(error.message); return; }
     onSaved();
