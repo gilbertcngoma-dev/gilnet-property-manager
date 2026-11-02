@@ -63,7 +63,7 @@ class Query implements PromiseLike<Result> {
       const t = db()[this.table];
       if (this.op === "insert") {
         const list = (Array.isArray(this.payload) ? this.payload : [this.payload]) as Record<string, unknown>[];
-        const rows = list.map((p) => ({ ...DEFAULTS[this.table](), created_at: new Date().toISOString(), ...p, id: (p.id as string) || crypto.randomUUID() })) as Row[];
+        const rows = list.map((p) => ({ ...DEFAULTS[this.table](), created_at: new Date().toISOString(), ...p, id: (p["id"] as string) || crypto.randomUUID() })) as Row[];
         await t.bulkPut(rows);
         return { data: rows, error: null };
       }
@@ -119,8 +119,8 @@ export async function importBackup(b: Backup) {
   await d.transaction("rw", d.rooms, d.stays, d.restaurant_sales, async () => {
     // Rooms are matched by room number so two devices' rooms don't duplicate.
     const existing = await d.rooms.toArray();
-    const byNo = new Map(existing.map((r) => [r.room_no, r.id]));
-    await d.rooms.bulkPut(b.rooms.map((r) => ({ ...r, id: byNo.get(r.room_no) ?? r.id })));
+    const byNo = new Map(existing.map((r) => [r["room_no"], r.id]));
+    await d.rooms.bulkPut(b.rooms.map((r) => ({ ...r, id: byNo.get(r["room_no"]) ?? r.id })));
     await d.stays.bulkPut(b.stays);
     await d.restaurant_sales.bulkPut(b.restaurant_sales);
   });
