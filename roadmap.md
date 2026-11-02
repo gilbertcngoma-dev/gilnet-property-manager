@@ -16,3 +16,5 @@
 - [x] Dashboard room cards: Assign Guest (vacant → Front Desk pre-selected) and View Reservation (occupied → Reservations).
 - [x] Offline mode: service worker (published app only), offline banner with queued count, check-ins saved locally and synced when back online.
 - [x] Department-scoped access (housekeeping sees rooms only, restaurant adds sales only); Extend stay hidden for housekeeping.
+- [x] Offline: saved copy of data on device; restaurant sales and room status save without internet.
+- [ ] Full offline-first rebuild: device storage as main database, Backup page (Export/Import/Backup to Cloud), no auto-sync, "Offline Mode - Working Locally" — waiting on user answers about login, multiple computers and departments.
