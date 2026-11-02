@@ -3,7 +3,7 @@ import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { gcTime: 1000 * 60 * 60 * 24 * 7, networkMode: "offlineFirst" }, mutations: { networkMode: "offlineFirst" } } });
+  const queryClient = new QueryClient({ defaultOptions: { queries: { gcTime: 1000 * 60 * 60 * 24 * 7, networkMode: "always", staleTime: 0 }, mutations: { networkMode: "always" } } });
 
   const router = createRouter({
     routeTree,

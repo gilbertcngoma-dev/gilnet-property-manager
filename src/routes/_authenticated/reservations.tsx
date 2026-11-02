@@ -28,6 +28,7 @@ const BADGE: Record<Stay["status"], string> = {
   Confirmed: "badge-confirmed",
   Pending: "badge-pending",
   "Checked-in": "badge-checkedin",
+  "Checked-out": "badge",
   Cancelled: "badge",
   "Later Date": "badge-pending",
 };

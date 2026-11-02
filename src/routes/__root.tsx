@@ -9,10 +9,6 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { persistQueryClient } from "@tanstack/react-query-persist-client";
-import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
-
-const CACHE_KEY = "lodge-offline-cache";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -92,21 +88,13 @@ function RootComponent() {
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
-      else { queryClient.clear(); localStorage.removeItem(CACHE_KEY); }
+
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
   useEffect(() => {
     registerAppSW();
-    // Keep a saved copy of lodge data so pages still show records without internet.
-    const [unsubscribe] = persistQueryClient({
-      queryClient,
-      persister: createSyncStoragePersister({ storage: window.localStorage, key: CACHE_KEY }),
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
-    return unsubscribe;
-  }, [queryClient]);
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <InstallAppProvider><Outlet /></InstallAppProvider>

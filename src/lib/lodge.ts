@@ -9,7 +9,7 @@ export type Room = {
   floor: number;
 };
 
-export type StayStatus = "Confirmed" | "Pending" | "Checked-in" | "Cancelled" | "Later Date";
+export type StayStatus = "Confirmed" | "Pending" | "Checked-in" | "Checked-out" | "Cancelled" | "Later Date";
 export const STATUS_FILTERS = ["All", "Confirmed", "Pending", "Cancelled", "Later Date"] as const;
 export type StatusFilter = (typeof STATUS_FILTERS)[number];
 
