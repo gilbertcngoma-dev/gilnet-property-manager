@@ -26,10 +26,12 @@ export default defineConfig({
           navigateFallbackDenylist: [/^\/~oauth/],
           runtimeCaching: [
             {
-              urlPattern: ({ request, url }: { request: Request; url: URL }) =>
-                request.mode === "navigate" && !url.pathname.startsWith("/~oauth"),
+              // App pages: also matched for the warm-up fetches in sw-register so every page opens offline.
+              urlPattern: ({ request, url, sameOrigin }: { request: Request; url: URL; sameOrigin: boolean }) =>
+                sameOrigin && !url.pathname.startsWith("/~oauth") &&
+                (request.mode === "navigate" || ["/", "/front-desk", "/reservations", "/rooms", "/restaurant", "/reports", "/backup", "/staff"].includes(url.pathname)),
               handler: "NetworkFirst",
-              options: { cacheName: "pages", networkTimeoutSeconds: 5 },
+              options: { cacheName: "pages", networkTimeoutSeconds: 3, matchOptions: { ignoreSearch: true } },
             },
             {
               urlPattern: ({ url, sameOrigin }: { url: URL; sameOrigin: boolean }) =>

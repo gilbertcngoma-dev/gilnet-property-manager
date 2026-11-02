@@ -28,6 +28,13 @@ export function registerAppSW() {
     return;
   }
   window.addEventListener("load", () => {
-    void navigator.serviceWorker.register("/sw.js");
+    void navigator.serviceWorker.register("/sw.js").then(async () => {
+      await navigator.serviceWorker.ready;
+      if (!navigator.onLine) return;
+      // Save every page once so the app opens during a blackout with no WiFi.
+      for (const p of ["/", "/front-desk", "/reservations", "/rooms", "/restaurant", "/reports", "/backup", "/staff"]) {
+        void fetch(p, { credentials: "same-origin" }).catch(() => {});
+      }
+    });
   });
 }
