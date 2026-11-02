@@ -1,9 +1,10 @@
+import { useSessionRole } from "@/lib/pin";
 import { updateRoomOfflineFirst } from "@/lib/offline";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { roomsQuery, staysQuery, todayISO, calcStay, kwacha, canExtendStay, currentStayForRoom, myRolesQuery, allowedPages, type Room, type Stay } from "@/lib/lodge";
+import { local } from "@/lib/localdb";
+import { roomsQuery, staysQuery, todayISO, calcStay, kwacha, canExtendStay, currentStayForRoom, allowedPages, type Room, type Stay } from "@/lib/lodge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/rooms")({
@@ -29,9 +30,8 @@ const next: Record<Room["status"], Room["status"]> = { Vacant: "Occupied", Occup
 
 function Rooms() {
   const qc = useQueryClient();
-  const { userId } = Route.useRouteContext();
-  const myRoles = useQuery(myRolesQuery(userId)).data ?? [];
-  const frontOffice = allowedPages(myRoles) === "all";
+  const role = useSessionRole();
+  const frontOffice = !!role && allowedPages([role]) === "all";
   const rooms = useQuery(roomsQuery).data ?? [];
   const stays = useQuery(staysQuery).data ?? [];
   const [extending, setExtending] = useState<Stay | null>(null);
@@ -44,7 +44,7 @@ function Rooms() {
     e.preventDefault();
     if (!extending || !canExtendStay(extending.check_out, checkout)) { setMessage("Choose a date later than the current check-out."); return; }
     setSaving(true);
-    const { data, error } = await supabase.from("stays").update({ check_out: checkout }).eq("id", extending.id).eq("check_out", extending.check_out).select("id");
+    const { data, error } = await local.from("stays").update({ check_out: checkout }).eq("id", extending.id).eq("check_out", extending.check_out).select("id");
     setSaving(false);
     if (error) { setMessage(error.message); return; }
     if (!data?.length) { setMessage("This stay changed. Refresh Rooms and try again."); return; }
@@ -60,7 +60,7 @@ function Rooms() {
   async function add(e: React.FormEvent) {
     e.preventDefault();
     if (!n.room_no) return;
-    await supabase.from("rooms").insert(n);
+    await local.from("rooms").insert(n);
     setN({ ...n, room_no: "" });
     qc.invalidateQueries({ queryKey: ["rooms"] });
   }

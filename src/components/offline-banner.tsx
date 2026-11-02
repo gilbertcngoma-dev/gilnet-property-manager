@@ -1,16 +1,10 @@
-import { Plane } from "lucide-react";
-import { useOnlineStatus, usePendingCount } from "@/lib/offline";
+import { HardDrive } from "lucide-react";
 
 export function OfflineBanner() {
-  const online = useOnlineStatus();
-  const pending = usePendingCount();
-  if (online) return null;
   return (
     <div className="flex items-center gap-2 bg-accent px-4 py-2 text-sm font-medium text-accent-foreground">
-      <Plane className="h-4 w-4" />
-      <span>
-        Offline Mode — {pending} saved change{pending === 1 ? "" : "s"} will sync when online
-      </span>
+      <HardDrive className="h-4 w-4" />
+      <span>Offline Mode - Working Locally</span>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { local } from "@/lib/localdb";
 import { useEffect, useState } from "react";
 import { BedDouble, CalendarDays, Plus, Search } from "lucide-react";
 import { calcStay, filterReservations, kwacha, roomsQuery, staysQuery, todayISO, type ReservationPill, type Stay, STATUS_FILTERS, type StatusFilter } from "@/lib/lodge";
@@ -28,6 +28,7 @@ const BADGE: Record<Stay["status"], string> = {
   Confirmed: "badge-confirmed",
   Pending: "badge-pending",
   "Checked-in": "badge-checkedin",
+  "Checked-out": "badge",
   Cancelled: "badge",
   "Later Date": "badge-pending",
 };
@@ -54,7 +55,7 @@ function Reservations() {
   const [receiptFor, setReceiptFor] = useState<string | null>(null);
   const [receipt, setReceipt] = useState("");
   async function saveReceipt(id: string) {
-    const { error } = await supabase.from("stays").update({ receipt_no: receipt.trim() || null }).eq("id", id);
+    const { error } = await local.from("stays").update({ receipt_no: receipt.trim() || null }).eq("id", id);
     if (error) { alert(error.message); return; }
     setReceiptFor(null);
     await qc.invalidateQueries({ queryKey: ["stays"] });
