@@ -8,10 +8,10 @@ import { todayISO } from "@/lib/lodge";
 export const Route = createFileRoute("/_authenticated/backup")({
   head: () => ({
     meta: [
-      { title: "Backup — Lodge Manager" },
-      { name: "description", content: "Export, import or back up lodge records saved on this computer." },
-      { property: "og:title", content: "Backup — Lodge Manager" },
-      { property: "og:description", content: "Export, import or back up lodge records saved on this computer." },
+      { title: "Backup — GILNET Property Manager" },
+      { name: "description", content: "Export, import or back up property records saved on this computer." },
+      { property: "og:title", content: "Backup — GILNET Property Manager" },
+      { property: "og:description", content: "Export, import or back up property records saved on this computer." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

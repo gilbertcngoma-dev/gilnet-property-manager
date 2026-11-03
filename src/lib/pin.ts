@@ -7,7 +7,7 @@ export type PinMap = Partial<Record<AppRole, string>>;
 const KEY = "lodge-session-role";
 
 export async function hashPin(pin: string) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("chaniche:" + pin));
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("gilnet:" + pin));
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 

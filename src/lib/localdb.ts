@@ -12,7 +12,7 @@ class LocalDB extends Dexie {
   restaurant_sales!: Table<Row, string>;
   settings!: Table<{ key: string; value: unknown }, string>;
   constructor() {
-    super("chaniche-lodge-local");
+    super("gilnet-property-manager");
     this.version(1).stores({ rooms: "id, room_no", stays: "id, room_no, check_in", restaurant_sales: "id, sale_date", settings: "key" });
   }
 }
@@ -32,7 +32,7 @@ const today = () => {
 const DEFAULTS: Record<DataTable, () => Record<string, unknown>> = {
   rooms: () => ({ room_type: "Standard", status: "Vacant", floor: 1 }),
   stays: () => ({ rate_per_night: 0, laundry_cost: 0, amount_paid: 0, payment_method: "Cash", phone: null, guest_requests: null, status: "Confirmed", receipt_no: null }),
-  restaurant_sales: () => ({ sale_date: today(), quantity: 1, unit_price: 0, room_no: null, payment_method: "Cash", service_type: "Restaurant" }),
+  restaurant_sales: () => ({ sale_date: today(), quantity: 1, unit_price: 0, room_no: null, payment_method: "Cash", service_type: "Restaurant", receipt_no: null }),
 };
 
 /** Rooms 01–15 (04–06 Twin) are created the first time the app opens on a device. */
@@ -100,17 +100,17 @@ export const local = {
   }),
 };
 
-export type Backup = { app: "chaniche-lodge"; version: 1; exported_at: string } & Record<DataTable, Row[]>;
+export type Backup = { app: "gilnet-property-manager"; version: 1; exported_at: string } & Record<DataTable, Row[]>;
 
 export async function exportBackup(): Promise<Backup> {
   const d = db();
   const [rooms, stays, restaurant_sales] = await Promise.all([d.rooms.toArray(), d.stays.toArray(), d.restaurant_sales.toArray()]);
-  return { app: "chaniche-lodge", version: 1, exported_at: new Date().toISOString(), rooms, stays, restaurant_sales };
+  return { app: "gilnet-property-manager", version: 1, exported_at: new Date().toISOString(), rooms, stays, restaurant_sales };
 }
 
 export function isBackup(x: unknown): x is Backup {
   const b = x as Backup;
-  return !!b && b.app === "chaniche-lodge" && DATA_TABLES.every((t) => Array.isArray(b[t]) && b[t].every((r) => typeof r?.id === "string"));
+  return !!b && b.app === "gilnet-property-manager" && DATA_TABLES.every((t) => Array.isArray(b[t]) && b[t].every((r) => typeof r?.id === "string"));
 }
 
 /** Merge a backup into this device: records with the same id are replaced, others are added. */

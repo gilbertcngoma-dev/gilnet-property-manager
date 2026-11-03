@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { allowedPages } from "@/lib/lodge";
 import { seedRooms } from "@/lib/localdb";
 import { getPins, isValidPin, roleForPin, setPin, setSessionRole, useSessionRole } from "@/lib/pin";
+import { getProperty, saveProperty, type Property } from "@/lib/property";
 import { InstallAppButton } from "@/components/install-app";
 import { OfflineBanner } from "@/components/offline-banner";
+import { StatusDot } from "@/components/status-dot";
 
 // The app runs entirely on this device; a PIN replaces online sign-in.
 export const Route = createFileRoute("/_authenticated")({
@@ -21,12 +23,13 @@ const nav = [
   { to: "/reports", label: "Reports" },
 ] as const;
 
-const DEPT_LABEL = { admin: "Manager", staff: "Front office", housekeeping: "Housekeeping", restaurant: "Restaurant" } as const;
+const DEPT_LABEL = { admin: "Owner / Manager", staff: "Front office", housekeeping: "Housekeeping", restaurant: "Restaurant" } as const;
 
 function PinGate() {
   const [hasManager, setHasManager] = useState<boolean | null>(null);
   const [pin, setPinValue] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [prop, setProp] = useState<Property>({ name: "", code: "", address: "" });
   const [msg, setMsg] = useState("");
   useEffect(() => { void seedRooms(); void getPins().then((p) => setHasManager(!!p.admin)); }, []);
 
@@ -34,8 +37,10 @@ function PinGate() {
     e.preventDefault();
     setMsg("");
     if (!hasManager) {
-      if (!isValidPin(pin)) { setMsg("Use 4 to 8 numbers."); return; }
+      if (!prop.name.trim()) { setMsg("Enter the property name."); return; }
+      if (!isValidPin(pin)) { setMsg("Use 4 to 8 numbers for the PIN."); return; }
       if (pin !== confirm) { setMsg("The two PINs don't match."); return; }
+      await saveProperty({ name: prop.name.trim(), code: prop.code.trim().toUpperCase(), address: prop.address.trim() });
       await setPin("admin", pin);
       setSessionRole("admin");
       return;
@@ -51,16 +56,26 @@ function PinGate() {
       <OfflineBanner />
       <div className="flex flex-1 items-center justify-center p-4">
         <form onSubmit={submit} className="card w-full max-w-sm space-y-4">
-          <h1 className="font-display text-2xl font-bold">Chaniche Lodge</h1>
+          <h1 className="font-display text-2xl font-bold">GILNET PROPERTY MANAGER</h1>
           <p className="text-sm text-muted-foreground">
-            {hasManager ? "Enter your PIN to open the lodge app." : "First time on this computer: create the manager PIN (4–8 numbers)."}
+            {hasManager ? "Enter your PIN to open the app." : "First time on this computer: set up your property and create the owner PIN (4–8 numbers)."}
           </p>
-          <div><label htmlFor="pin" className="label">{hasManager ? "PIN" : "New manager PIN"}</label>
-            <input id="pin" type="password" inputMode="numeric" autoFocus className="field" value={pin} onChange={(e) => setPinValue(e.target.value)} /></div>
+          {!hasManager && (
+            <>
+              <div><label htmlFor="prop-name" className="label">Property name</label>
+                <input id="prop-name" className="field" autoFocus value={prop.name} onChange={(e) => setProp({ ...prop, name: e.target.value })} placeholder="e.g. Gilnet Lodge" /></div>
+              <div><label htmlFor="prop-code" className="label">Property code (optional)</label>
+                <input id="prop-code" className="field" value={prop.code} onChange={(e) => setProp({ ...prop, code: e.target.value })} placeholder="e.g. KITWE" maxLength={12} /></div>
+              <div><label htmlFor="prop-addr" className="label">Address (optional)</label>
+                <input id="prop-addr" className="field" value={prop.address} onChange={(e) => setProp({ ...prop, address: e.target.value })} /></div>
+            </>
+          )}
+          <div><label htmlFor="pin" className="label">{hasManager ? "PIN" : "New owner PIN"}</label>
+            <input id="pin" type="password" inputMode="numeric" autoFocus={hasManager} className="field" value={pin} onChange={(e) => setPinValue(e.target.value)} /></div>
           {!hasManager && <div><label htmlFor="pin2" className="label">Repeat PIN</label>
             <input id="pin2" type="password" inputMode="numeric" className="field" value={confirm} onChange={(e) => setConfirm(e.target.value)} /></div>}
           {msg && <p role="alert" className="text-sm text-destructive">{msg}</p>}
-          <button className="btn w-full">{hasManager ? "Open" : "Save PIN"}</button>
+          <button className="btn w-full">{hasManager ? "Open" : "Save and open"}</button>
         </form>
       </div>
     </div>
@@ -70,7 +85,8 @@ function PinGate() {
 function Layout() {
   const role = useSessionRole();
   const { pathname } = useLocation();
-  useEffect(() => { void seedRooms(); }, []);
+  const [prop, setProp] = useState<Property | null>(null);
+  useEffect(() => { void seedRooms(); void getProperty().then(setProp); }, []);
   if (!role) return <PinGate />;
 
   const pages = allowedPages([role]);
@@ -83,8 +99,8 @@ function Layout() {
     <div className="flex min-h-screen flex-col md:flex-row">
       <aside className="bg-sidebar text-sidebar-foreground md:w-56 md:shrink-0">
         <div className="p-5">
-          <div className="font-display text-xl font-bold">Lodge Manager</div>
-          <div className="text-xs opacity-70">{DEPT_LABEL[role]}</div>
+          <div className="font-display text-lg font-bold leading-tight">GILNET PROPERTY MANAGER</div>
+          <div className="mt-1 text-xs opacity-70">{prop?.name ? `${prop.name} · ` : ""}{DEPT_LABEL[role]}</div>
         </div>
         <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col">
           {visibleNav.map((n) => (
@@ -97,7 +113,10 @@ function Layout() {
         <div className="border-t border-sidebar-foreground/20 px-3 py-2"><InstallAppButton /></div>
       </aside>
       <div className="flex flex-1 flex-col">
-        <OfflineBanner />
+        <div className="flex items-center justify-between gap-2 pr-4">
+          <div className="flex-1"><OfflineBanner /></div>
+          <StatusDot />
+        </div>
         <main className="flex-1 p-4 md:p-8"><Outlet /></main>
       </div>
     </div>
