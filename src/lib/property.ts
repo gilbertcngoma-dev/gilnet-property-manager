@@ -24,7 +24,7 @@ export function suggestReceiptNo(...lists: WithReceipt[][]): string {
   for (const list of lists)
     for (const r of list) {
       const m = /^(\d+)$/.exec((r.receipt_no ?? "").trim());
-      if (m) max = Math.max(max, parseInt(m[1], 10));
+      if (m) max = Math.max(max, parseInt(m[1] ?? "0", 10));
     }
   return formatReceipt(max + 1);
 }
