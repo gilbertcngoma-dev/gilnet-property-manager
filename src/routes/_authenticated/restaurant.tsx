@@ -6,15 +6,6 @@ import { local } from "@/lib/localdb";
 import { MENU_ITEMS, PAYMENT_METHODS, ROOM_NUMBERS, ROOM_SERVICE_CHARGE_ITEM, kwacha, todayISO } from "@/lib/lodge";
 import { Button } from "@/components/ui/button";
 
-export const restaurantQuery = queryOptions({
-  queryKey: ["restaurant_sales"],
-  queryFn: async () => {
-    const { data, error } = await local.from("restaurant_sales").select("*").order("created_at", { ascending: false });
-    if (error) throw error;
-    return data;
-  },
-});
-
 type Sale = {
   id: string;
   sale_date: string;
@@ -24,7 +15,17 @@ type Sale = {
   room_no: string | null;
   payment_method: string;
   service_type: string;
+  receipt_no?: string | null;
 };
+
+export const restaurantQuery = queryOptions({
+  queryKey: ["restaurant_sales"],
+  queryFn: async () => {
+    const { data, error } = await local.from("restaurant_sales").select("*").order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as unknown as Sale[];
+  },
+});
 
 export const Route = createFileRoute("/_authenticated/restaurant")({
   head: () => ({
