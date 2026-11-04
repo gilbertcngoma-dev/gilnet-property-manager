@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { local } from "@/lib/localdb";
 import { useEffect, useState } from "react";
 import { BedDouble, CalendarDays, Plus, Search } from "lucide-react";
 import { calcStay, filterReservations, kwacha, roomsQuery, staysQuery, todayISO, type ReservationPill, type Stay, STATUS_FILTERS, type StatusFilter } from "@/lib/lodge";
@@ -44,7 +43,6 @@ function Reservations() {
   const roomByNo = new Map(rooms.map((r) => [r.room_no, r]));
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/reservations" });
-  const qc = useQueryClient();
   const status: StatusFilter = (STATUS_FILTERS as readonly string[]).includes(search.status) ? (search.status as StatusFilter) : "All";
   useEffect(() => {
     const saved = localStorage.getItem(STATUS_KEY);
