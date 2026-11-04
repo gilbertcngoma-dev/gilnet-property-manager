@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { allowedPages } from "@/lib/lodge";
 import { seedRooms } from "@/lib/localdb";
 import { getPins, isValidPin, roleForPin, setPin, setSessionRole, useSessionRole } from "@/lib/pin";
-import { getProperty, saveProperty, type Property } from "@/lib/property";
+import { getProperty, isValidCode, saveProperty, type Property } from "@/lib/property";
 import { InstallAppButton } from "@/components/install-app";
 import { OfflineBanner } from "@/components/offline-banner";
 import { StatusDot } from "@/components/status-dot";
@@ -38,6 +38,7 @@ function PinGate() {
     setMsg("");
     if (!hasManager) {
       if (!prop.name.trim()) { setMsg("Enter the property name."); return; }
+      if (!isValidCode(prop.code.trim().toUpperCase())) { setMsg("Property code must be 3 to 8 letters, e.g. KITWE."); return; }
       if (!isValidPin(pin)) { setMsg("Use 4 to 8 numbers for the PIN."); return; }
       if (pin !== confirm) { setMsg("The two PINs don't match."); return; }
       await saveProperty({ name: prop.name.trim(), code: prop.code.trim().toUpperCase(), address: prop.address.trim() });
@@ -64,7 +65,7 @@ function PinGate() {
             <>
               <div><label htmlFor="prop-name" className="label">Property name</label>
                 <input id="prop-name" className="field" autoFocus value={prop.name} onChange={(e) => setProp({ ...prop, name: e.target.value })} placeholder="e.g. Gilnet Lodge" /></div>
-              <div><label htmlFor="prop-code" className="label">Property code (optional)</label>
+              <div><label htmlFor="prop-code" className="label">Property code (3–8 letters)</label>
                 <input id="prop-code" className="field" value={prop.code} onChange={(e) => setProp({ ...prop, code: e.target.value })} placeholder="e.g. KITWE" maxLength={12} /></div>
               <div><label htmlFor="prop-addr" className="label">Address (optional)</label>
                 <input id="prop-addr" className="field" value={prop.address} onChange={(e) => setProp({ ...prop, address: e.target.value })} /></div>
@@ -107,14 +108,14 @@ function Layout() {
             <Link key={n.to} to={n.to} activeOptions={{ exact: true }} className={linkCls} activeProps={active}>{n.label}</Link>
           ))}
           {pages === "all" && <Link to="/backup" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>Backup</Link>}
+          {role === "admin" && <Link to="/settings" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>Settings</Link>}
           {role === "admin" && <Link to="/staff" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>PINs</Link>}
           <button type="button" className={`${linkCls} text-left`} onClick={() => setSessionRole(null)}>Lock</button>
         </nav>
         <div className="border-t border-sidebar-foreground/20 px-3 py-2"><InstallAppButton /></div>
       </aside>
       <div className="flex flex-1 flex-col">
-        <div className="flex items-center justify-between gap-2 pr-4">
-          <div className="flex-1"><OfflineBanner /></div>
+        <div className="flex items-center justify-end gap-2 p-3">
           <StatusDot />
         </div>
         <main className="flex-1 p-4 md:p-8"><Outlet /></main>
