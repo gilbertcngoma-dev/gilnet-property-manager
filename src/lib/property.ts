@@ -13,28 +13,31 @@ export async function saveProperty(p: Property) {
   await db().settings.put({ key: "property", value: p });
 }
 
-/** Receipt numbers are plain zero-padded numbers: 0001, 0002, … */
-export const formatReceipt = (n: number) => String(Math.max(1, n)).padStart(4, "0");
+export const isValidCode = (c: string) => /^[A-Z]{3,8}$/.test(c);
+
+/** Receipt numbers look like {CODE}-0001, typed from the receipt book. */
+export const formatReceipt = (code: string, n: number) => `${code ? code + "-" : ""}${String(Math.max(1, n)).padStart(4, "0")}`;
 
 type WithReceipt = { id?: string; receipt_no?: string | null };
 
-/** Next unused receipt number across stays and restaurant sales. */
-export function suggestReceiptNo(...lists: WithReceipt[][]): string {
+/** Next unused receipt number for this property across stays and restaurant sales. */
+export function suggestReceiptNo(code: string, ...lists: WithReceipt[][]): string {
   let max = 0;
+  const re = new RegExp(`^(?:${code}-)?(\\d+)$`, "i");
   for (const list of lists)
     for (const r of list) {
-      const m = /^(\d+)$/.exec((r.receipt_no ?? "").trim());
+      const m = re.exec((r.receipt_no ?? "").trim());
       if (m) max = Math.max(max, parseInt(m[1] ?? "0", 10));
     }
-  return formatReceipt(max + 1);
+  return formatReceipt(code, max + 1);
 }
 
-/** True when no other record already uses this receipt number. */
+/** True when another record already uses this receipt number (case-insensitive). */
 export function receiptTaken(no: string, excludeId: string | undefined, ...lists: WithReceipt[][]): boolean {
-  const needle = no.trim();
+  const needle = no.trim().toUpperCase();
   if (!needle) return false;
   for (const list of lists)
     for (const r of list)
-      if (r.id !== excludeId && (r.receipt_no ?? "").trim() === needle) return true;
+      if (r.id !== excludeId && (r.receipt_no ?? "").trim().toUpperCase() === needle) return true;
   return false;
 }

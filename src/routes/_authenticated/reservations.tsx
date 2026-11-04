@@ -1,8 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
-import { local } from "@/lib/localdb";
 import { useEffect, useState } from "react";
 import { BedDouble, CalendarDays, Plus, Search } from "lucide-react";
 import { calcStay, filterReservations, kwacha, roomsQuery, staysQuery, todayISO, type ReservationPill, type Stay, STATUS_FILTERS, type StatusFilter } from "@/lib/lodge";
@@ -44,7 +43,6 @@ function Reservations() {
   const roomByNo = new Map(rooms.map((r) => [r.room_no, r]));
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/reservations" });
-  const qc = useQueryClient();
   const status: StatusFilter = (STATUS_FILTERS as readonly string[]).includes(search.status) ? (search.status as StatusFilter) : "All";
   useEffect(() => {
     const saved = localStorage.getItem(STATUS_KEY);
@@ -52,14 +50,6 @@ function Reservations() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const setStatus = (v: string) => { localStorage.setItem(STATUS_KEY, v); navigate({ search: { status: v }, replace: true }); };
-  const [receiptFor, setReceiptFor] = useState<string | null>(null);
-  const [receipt, setReceipt] = useState("");
-  async function saveReceipt(id: string) {
-    const { error } = await local.from("stays").update({ receipt_no: receipt.trim() || null }).eq("id", id);
-    if (error) { alert(error.message); return; }
-    setReceiptFor(null);
-    await qc.invalidateQueries({ queryKey: ["stays"] });
-  }
   const list = filterReservations(stays, pill, q, today, status);
 
   return (
@@ -139,19 +129,7 @@ function Reservations() {
                 <div className="text-sm">
                   <span className="font-medium">Booking Down Payment:</span> {kwacha(Number(s.amount_paid))} paid / {kwacha(k.balance)} balance
                 </div>
-                {s.receipt_no && <div className="text-sm"><span className="font-medium">Receipt No:</span> {s.receipt_no}</div>}
               </Link>
-              {s.status === "Checked-in" && (receiptFor === s.id ? (
-                <div className="flex gap-2">
-                  <input aria-label="Receipt number" className="field" value={receipt} onChange={(e) => setReceipt(e.target.value)} placeholder="Receipt number" maxLength={50} />
-                  <button type="button" className="btn" onClick={() => saveReceipt(s.id)}>Save</button>
-                  <button type="button" className="btn-ghost" onClick={() => setReceiptFor(null)}>Cancel</button>
-                </div>
-              ) : (
-                <button type="button" className="btn-ghost text-sm" onClick={() => { setReceiptFor(s.id); setReceipt(s.receipt_no ?? ""); }}>
-                  {s.receipt_no ? "Edit receipt number" : "Add receipt number"}
-                </button>
-              ))}
               </div>
             );
           })}
