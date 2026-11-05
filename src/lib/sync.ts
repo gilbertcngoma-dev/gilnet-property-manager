@@ -3,7 +3,7 @@
 import { DATA_TABLES, db, type DataTable, type Row } from "@/lib/localdb";
 import { getProperty } from "@/lib/property";
 
-const ts = (r: { updated_at?: unknown; created_at?: unknown } | undefined) => String(r?.updated_at ?? r?.created_at ?? "");
+const ts = (r: Record<string, unknown> | undefined) => String(r?.["updated_at"] ?? r?.["created_at"] ?? "");
 
 export type SyncResult = { sent: number; received: number; at: string };
 
@@ -30,7 +30,8 @@ export async function syncNow(): Promise<SyncResult> {
 
   const { data: cloud, error } = await sb.from("property_records").select("id, table_name, data, deleted").eq("property_code", code);
   if (error) throw error;
-  const cloudMap = new Map(cloud.map((c) => [`${c.table_name}:${c.id}`, c]));
+  const rows = cloud ?? [];
+  const cloudMap = new Map(rows.map((c) => [`${c.table_name}:${c.id}`, c]));
   const deletions = new Map((await d.deletions.toArray()).map((x) => [`${x.table}:${x.id}`, x]));
   let received = 0;
   const outgoing: { id: string; owner_id: string; property_code: string; table_name: DataTable; data: Row | { updated_at: string }; deleted: boolean }[] = [];
@@ -39,7 +40,7 @@ export async function syncNow(): Promise<SyncResult> {
     const t = d[table];
     const local = new Map((await t.toArray()).map((r) => [r.id, r]));
     // Pull newer cloud changes
-    for (const c of cloud.filter((x) => x.table_name === table)) {
+    for (const c of rows.filter((x) => x.table_name === table)) {
       const cData = c.data as Row & { updated_at?: string };
       const mine = local.get(c.id);
       const del = deletions.get(`${table}:${c.id}`);
