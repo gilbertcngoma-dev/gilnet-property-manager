@@ -53,6 +53,36 @@ export type Database = {
         }
         Relationships: []
       }
+      property_records: {
+        Row: {
+          data: Json | null
+          deleted: boolean
+          id: string
+          owner_id: string
+          property_code: string
+          table_name: string
+          updated_at: string
+        }
+        Insert: {
+          data?: Json | null
+          deleted?: boolean
+          id: string
+          owner_id?: string
+          property_code: string
+          table_name: string
+          updated_at?: string
+        }
+        Update: {
+          data?: Json | null
+          deleted?: boolean
+          id?: string
+          owner_id?: string
+          property_code?: string
+          table_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       restaurant_sales: {
         Row: {
           created_at: string

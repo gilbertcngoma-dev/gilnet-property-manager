@@ -11,9 +11,11 @@ class LocalDB extends Dexie {
   stays!: Table<Row, string>;
   restaurant_sales!: Table<Row, string>;
   settings!: Table<{ key: string; value: unknown }, string>;
+  deletions!: Table<{ id: string; table: DataTable; deleted_at: string }, string>;
   constructor() {
     super("gilnet-property-manager");
     this.version(1).stores({ rooms: "id, room_no", stays: "id, room_no, check_in", restaurant_sales: "id, sale_date", settings: "key" });
+    this.version(2).stores({ deletions: "id" });
   }
 }
 
@@ -82,7 +84,7 @@ class Query implements PromiseLike<Result> {
       const t = db()[this.table];
       if (this.op === "insert") {
         const list = (Array.isArray(this.payload) ? this.payload : [this.payload]) as Record<string, unknown>[];
-        const rows = list.map((p) => ({ ...DEFAULTS[this.table](), created_at: new Date().toISOString(), ...p, id: (p["id"] as string) || crypto.randomUUID() })) as Row[];
+        const rows = list.map((p) => ({ ...DEFAULTS[this.table](), created_at: new Date().toISOString(), ...p, updated_at: new Date().toISOString(), id: (p["id"] as string) || crypto.randomUUID() })) as Row[];
         if (this.table === "rooms") {
           const existing = new Set((await t.toArray()).map((r) => String(r["room_no"]).trim()));
           for (const r of rows) {
@@ -96,12 +98,14 @@ class Query implements PromiseLike<Result> {
       }
       let all = (await t.toArray()).filter((r) => this.matches(r));
       if (this.op === "update") {
-        const rows = all.map((r) => ({ ...r, ...(this.payload as object), id: r.id }));
+        const rows = all.map((r) => ({ ...r, ...(this.payload as object), id: r.id, updated_at: new Date().toISOString() }));
         await t.bulkPut(rows);
         return { data: rows, error: null };
       }
       if (this.op === "delete") {
         await t.bulkDelete(all.map((r) => r.id));
+        const at = new Date().toISOString();
+        await db().deletions.bulkPut(all.map((r) => ({ id: r.id, table: this.table, deleted_at: at })));
         return { data: all, error: null };
       }
       if (this.table === "rooms") {
