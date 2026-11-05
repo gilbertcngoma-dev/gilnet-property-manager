@@ -18,3 +18,5 @@
 - [x] Department-scoped access (housekeeping sees rooms only, restaurant adds sales only); Extend stay hidden for housekeeping.
 - [x] Offline: saved copy of data on device; restaurant sales and room status save without internet.
 - [ ] Full offline-first rebuild: device storage as main database, Backup page (Export/Import/Backup to Cloud), no auto-sync, "Offline Mode - Working Locally" — waiting on user answers about login, multiple computers and departments.
+- [x] Cloud sign-in per property + two-way sync between computers (Cloud sync page, auto every 5 min when online).
+- [ ] PDF reports on Reports page, restaurant receipt numbers, Google Drive backups, owner multi-property dashboard.
