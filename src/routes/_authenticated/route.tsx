@@ -7,6 +7,26 @@ import { getProperty, isValidCode, saveProperty, type Property } from "@/lib/pro
 import { InstallAppButton } from "@/components/install-app";
 import { OfflineBanner } from "@/components/offline-banner";
 import { StatusDot } from "@/components/status-dot";
+import { syncNow } from "@/lib/sync";
+import { useQueryClient } from "@tanstack/react-query";
+
+function AutoSync() {
+  const qc = useQueryClient();
+  useEffect(() => {
+    let busy = false;
+    const go = async () => {
+      if (busy || !navigator.onLine) return;
+      busy = true;
+      try { const r = await syncNow(); if (r.received) await qc.invalidateQueries(); } catch { /* offline or not signed in: keep working locally */ }
+      busy = false;
+    };
+    void go();
+    const t = setInterval(go, 5 * 60 * 1000);
+    window.addEventListener("online", go);
+    return () => { clearInterval(t); window.removeEventListener("online", go); };
+  }, [qc]);
+  return null;
+}
 
 // The app runs entirely on this device; a PIN replaces online sign-in.
 export const Route = createFileRoute("/_authenticated")({
@@ -98,6 +118,7 @@ function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
+      <AutoSync />
       <aside className="bg-sidebar text-sidebar-foreground md:w-56 md:shrink-0">
         <div className="p-5">
           <div className="font-display text-lg font-bold leading-tight">GILNET PROPERTY MANAGER</div>
@@ -109,6 +130,7 @@ function Layout() {
           ))}
           {pages === "all" && <Link to="/backup" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>Backup</Link>}
           {role === "admin" && <Link to="/settings" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>Settings</Link>}
+          {role === "admin" && <Link to="/sync" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>Cloud sync</Link>}
           {role === "admin" && <Link to="/staff" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>PINs</Link>}
           <button type="button" className={`${linkCls} text-left`} onClick={() => setSessionRole(null)}>Lock</button>
         </nav>
