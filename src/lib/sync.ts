@@ -24,7 +24,7 @@ export async function syncNow(): Promise<SyncResult> {
   const sb = await client();
   const user = await cloudUser();
   if (!user) throw new Error("Sign in to the cloud account first.");
-  const code = (await getProperty()).code;
+  const code = (await getProperty())?.code;
   if (!code) throw new Error("Set a property code in Settings first.");
   const d = db();
 
