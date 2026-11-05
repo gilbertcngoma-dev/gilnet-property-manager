@@ -78,6 +78,13 @@
       "when": 1793588227863,
       "tag": "0010_cloud_backups",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793851537196,
+      "tag": "0011_migration",
+      "breakpoints": true
     }
   ]
 }
