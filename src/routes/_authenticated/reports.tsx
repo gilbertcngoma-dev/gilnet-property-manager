@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import * as XLSX from "xlsx";
+import { useEffect, useState } from "react";
+import { restaurantQuery } from "./restaurant";
+import { restaurantPdf, roomStatusPdf, type SaleRow } from "@/lib/pdf-reports";
+import { getProperty, type Property } from "@/lib/property";
 import { calcStay, kwacha, roomsQuery, staysQuery, todayISO, type Room, type Stay } from "@/lib/lodge";
 
 export const Route = createFileRoute("/_authenticated/reports")({
@@ -70,6 +74,38 @@ function downloadExcel(stays: Stay[], rooms: Room[]) {
   XLSX.writeFile(wb, `chaniche-lodge-report-${todayISO()}.xlsx`);
 }
 
+function PdfReports({ rooms, stays }: { rooms: Room[]; stays: Stay[] }) {
+  const sales = (useQuery(restaurantQuery).data ?? []) as unknown as SaleRow[];
+  const [from, setFrom] = useState(todayISO());
+  const [to, setTo] = useState(todayISO());
+  const [prop, setProp] = useState<Property | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { void getProperty().then(setProp); }, []);
+  const run = async (kind: "rooms" | "sales", mode: "download" | "print") => {
+    setBusy(true);
+    try {
+      const base = { range: { from, to }, code: prop?.code ?? "", propName: prop?.name ?? "", printedBy: "Front desk", mode };
+      if (kind === "rooms") await roomStatusPdf({ ...base, rooms, stays });
+      else await restaurantPdf({ ...base, sales });
+    } finally { setBusy(false); }
+  };
+  return (
+    <div className="card space-y-4">
+      <h2 className="text-lg font-semibold">PDF reports (work without internet)</h2>
+      <div className="flex flex-wrap gap-3">
+        <div><label htmlFor="pdf-from" className="label">From</label><input id="pdf-from" type="date" className="field" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
+        <div><label htmlFor="pdf-to" className="label">To</label><input id="pdf-to" type="date" className="field" value={to} min={from} onChange={(e) => setTo(e.target.value)} /></div>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-2"><div className="font-medium">Room check-in status</div>
+          <div className="flex gap-2"><button type="button" disabled={busy} className="btn" onClick={() => run("rooms", "download")}>Download PDF</button><button type="button" disabled={busy} className="btn" onClick={() => run("rooms", "print")}>Print</button></div></div>
+        <div className="space-y-2"><div className="font-medium">Restaurant sales</div>
+          <div className="flex gap-2"><button type="button" disabled={busy} className="btn" onClick={() => run("sales", "download")}>Download PDF</button><button type="button" disabled={busy} className="btn" onClick={() => run("sales", "print")}>Print</button></div></div>
+      </div>
+    </div>
+  );
+}
+
 function Reports() {
   const rooms = useQuery(roomsQuery).data ?? [];
   const stays = useQuery(staysQuery).data ?? [];
@@ -96,6 +132,7 @@ function Reports() {
         <div className="card"><h2 className="mb-4 text-lg font-semibold">Payments received</h2><Bars rows={Object.entries(byPay)} /></div>
         <div className="card"><h2 className="mb-2 text-lg font-semibold">Laundry income</h2><div className="text-3xl font-bold">{kwacha(laundry)}</div><p className="mt-1 text-xs text-muted-foreground">From {stays.length} stays</p></div>
       </div>
+      <PdfReports rooms={rooms} stays={stays} />
     </div>
   );
 }
