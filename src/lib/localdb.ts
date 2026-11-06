@@ -38,7 +38,12 @@ const DEFAULTS: Record<DataTable, () => Record<string, unknown>> = {
 };
 
 /** Rooms 01–15 (04–06 Twin) are created the first time the app opens on a device. */
-export async function seedRooms() {
+let seeding: Promise<void> | null = null;
+export function seedRooms() {
+  if (!seeding) seeding = doSeedRooms();
+  return seeding;
+}
+async function doSeedRooms() {
   const d = db();
   if ((await d.rooms.count()) > 0) { await dedupeRooms(); return; }
   const now = new Date().toISOString();
