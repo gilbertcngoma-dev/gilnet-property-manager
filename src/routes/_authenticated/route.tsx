@@ -8,6 +8,7 @@ import { InstallAppButton } from "@/components/install-app";
 import { OfflineBanner } from "@/components/offline-banner";
 import { StatusDot } from "@/components/status-dot";
 import { syncNow } from "@/lib/sync";
+import { pushCentralStatus } from "@/lib/central";
 import { useQueryClient } from "@tanstack/react-query";
 
 function AutoSync() {
@@ -17,7 +18,11 @@ function AutoSync() {
     const go = async () => {
       if (busy || !navigator.onLine) return;
       busy = true;
-      try { const r = await syncNow(); if (r.received) await qc.invalidateQueries(); } catch { /* offline or not signed in: keep working locally */ }
+      try {
+        const r = await syncNow();
+        await pushCentralStatus();
+        if (r.received) await qc.invalidateQueries();
+      } catch { /* offline or not signed in: keep working locally */ }
       busy = false;
     };
     void go();
@@ -131,6 +136,7 @@ function Layout() {
           {pages === "all" && <Link to="/backup" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>Backup</Link>}
           {role === "admin" && <Link to="/settings" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>Settings</Link>}
           {role === "admin" && <Link to="/sync" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>Cloud sync</Link>}
+          {role === "admin" && <Link to="/owner" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>All Lodges</Link>}
           {role === "admin" && <Link to="/staff" activeOptions={{ exact: true }} className={linkCls} activeProps={active}>PINs</Link>}
           <button type="button" className={`${linkCls} text-left`} onClick={() => setSessionRole(null)}>Lock</button>
         </nav>

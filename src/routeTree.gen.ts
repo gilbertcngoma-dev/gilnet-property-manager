@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated/backup'
 import { Route as AuthenticatedFrontDeskRouteImport } from './routes/_authenticated/front-desk'
+import { Route as AuthenticatedOwnerRouteImport } from './routes/_authenticated/owner'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedReservationsRouteImport } from './routes/_authenticated/reservations'
 import { Route as AuthenticatedRestaurantRouteImport } from './routes/_authenticated/restaurant'
@@ -50,6 +51,11 @@ const AuthenticatedBackupRoute = AuthenticatedBackupRouteImport.update({
 const AuthenticatedFrontDeskRoute = AuthenticatedFrontDeskRouteImport.update({
   id: '/front-desk',
   path: '/front-desk',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOwnerRoute = AuthenticatedOwnerRouteImport.update({
+  id: '/owner',
+  path: '/owner',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/backup': typeof AuthenticatedBackupRoute
   '/front-desk': typeof AuthenticatedFrontDeskRoute
+  '/owner': typeof AuthenticatedOwnerRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/reservations': typeof AuthenticatedReservationsRoute
   '/restaurant': typeof AuthenticatedRestaurantRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/backup': typeof AuthenticatedBackupRoute
   '/front-desk': typeof AuthenticatedFrontDeskRoute
+  '/owner': typeof AuthenticatedOwnerRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/reservations': typeof AuthenticatedReservationsRoute
   '/restaurant': typeof AuthenticatedRestaurantRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/backup': typeof AuthenticatedBackupRoute
   '/_authenticated/front-desk': typeof AuthenticatedFrontDeskRoute
+  '/_authenticated/owner': typeof AuthenticatedOwnerRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/reservations': typeof AuthenticatedReservationsRoute
   '/_authenticated/restaurant': typeof AuthenticatedRestaurantRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/backup'
     | '/front-desk'
+    | '/owner'
     | '/reports'
     | '/reservations'
     | '/restaurant'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/backup'
     | '/front-desk'
+    | '/owner'
     | '/reports'
     | '/reservations'
     | '/restaurant'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/backup'
     | '/_authenticated/front-desk'
+    | '/_authenticated/owner'
     | '/_authenticated/reports'
     | '/_authenticated/reservations'
     | '/_authenticated/restaurant'
@@ -229,6 +241,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFrontDeskRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/owner': {
+      id: '/_authenticated/owner'
+      path: '/owner'
+      fullPath: '/owner'
+      preLoaderRoute: typeof AuthenticatedOwnerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
@@ -284,6 +303,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBackupRoute: typeof AuthenticatedBackupRoute
   AuthenticatedFrontDeskRoute: typeof AuthenticatedFrontDeskRoute
+  AuthenticatedOwnerRoute: typeof AuthenticatedOwnerRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedReservationsRoute: typeof AuthenticatedReservationsRoute
   AuthenticatedRestaurantRoute: typeof AuthenticatedRestaurantRoute
@@ -297,6 +317,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBackupRoute: AuthenticatedBackupRoute,
   AuthenticatedFrontDeskRoute: AuthenticatedFrontDeskRoute,
+  AuthenticatedOwnerRoute: AuthenticatedOwnerRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedReservationsRoute: AuthenticatedReservationsRoute,
   AuthenticatedRestaurantRoute: AuthenticatedRestaurantRoute,
