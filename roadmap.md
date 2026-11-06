@@ -1,8 +1,9 @@
 # Requested additions
 - [x] Install button, room service, Pending payments, stay extensions, staff approval, Excel reports, guest phone/requests, reservations, departments, offline-first rebuild, cloud sign-in + two-way sync, setup wizard, receipt numbers on stays, PDF reports on Reports page.
-- [ ] Owner page: one screen showing every lodge's live status (today's guests, sales, cash, rooms, last check-in, last sync with green/yellow/red).
-- [ ] Settings upgrades: master cloud email, last sync + next sync countdown, Support section (mailto to support.gilnet.property.manager@gmail.com), "Check Cloud Backup" comparing cloud vs local record counts.
-- [ ] Windows app details: product name "Chaniche Lodge", GILNET copyright/author, Help menu with About dialog and Email Support button.
+- [x] Owner page ("All Lodges"): every lodge's live status — today's guests, sales, cash, rooms, last check-in, last sync with green/yellow/red. Verified in preview (shows sign-in prompt until cloud sign-in).
+- [x] Settings upgrades: master cloud email, last sync + next sync countdown, Support section (mailto to support.gilnet.property.manager@gmail.com), "Check Cloud Backup" comparing cloud vs local record counts. Verified in preview.
+- [x] Windows app details: product name "Chaniche Lodge", GILNET copyright/author, Help menu with About dialog and Email Support button.
+- [x] Fixed duplicate-room seeding race (single-flight seedRooms).
 - [ ] Receipt numbers on restaurant sales.
 - [ ] Google Drive backups (needs each lodge's Google account connected — deferred).
 - [ ] Transfer Property Ownership — risky as specced (cloud records belong to the old account and would be stranded); offer support-email assisted transfer instead.
