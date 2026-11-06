@@ -1,22 +1,10 @@
 # Requested additions
-- [x] Add and verify an install button with Chrome/Edge instructions and availability status (signed-in preview checked; native installation requires the published site).
-- [x] Add room-service restaurant sales.
-- [x] Add Pending payment option.
-- [x] Allow extending stays from Rooms.
-- [x] Verify the requested flows.
-- [x] Share app link with user (https://lodgeflow-stay-and-revenue.lovable.app).
-- [x] Restrict access to approved staff only (roles + approval page + pending screen).
-- [x] Prepare and verify a revised Windows download with startup diagnostics (archive and startup simulation checked; actual Windows launch requires the user's computer).
-- [x] Explain how to hide the chat bar when using the app on the computer.
-- [x] Add Excel report download on Reports (verified: valid .xlsx with Stays, Revenue by type, Payments, Laundry sheets).
-- [x] Add guest phone and guest requests to check-in/edit forms and guest lists.
-- [x] Add Upcoming reservations and Check-out history sections to Dashboard (verified in signed-in preview).
-- [x] Add booking status (Confirmed/Pending/Checked-in) to stays with 3 sample bookings.
-- [x] Reservations page: search, All/Today/Upcoming pills, booking cards, New Booking button, card click pre-fills Front Desk.
-- [x] Dashboard room cards: Assign Guest (vacant → Front Desk pre-selected) and View Reservation (occupied → Reservations).
-- [x] Offline mode: service worker (published app only), offline banner with queued count, check-ins saved locally and synced when back online.
-- [x] Department-scoped access (housekeeping sees rooms only, restaurant adds sales only); Extend stay hidden for housekeeping.
-- [x] Offline: saved copy of data on device; restaurant sales and room status save without internet.
-- [ ] Full offline-first rebuild: device storage as main database, Backup page (Export/Import/Backup to Cloud), no auto-sync, "Offline Mode - Working Locally" — waiting on user answers about login, multiple computers and departments.
-- [x] Cloud sign-in per property + two-way sync between computers (Cloud sync page, auto every 5 min when online).
-- [ ] PDF reports on Reports page, restaurant receipt numbers, Google Drive backups, owner multi-property dashboard.
+- [x] Install button, room service, Pending payments, stay extensions, staff approval, Excel reports, guest phone/requests, reservations, departments, offline-first rebuild, cloud sign-in + two-way sync, setup wizard, receipt numbers on stays, PDF reports on Reports page.
+- [ ] Owner page: one screen showing every lodge's live status (today's guests, sales, cash, rooms, last check-in, last sync with green/yellow/red).
+- [ ] Settings upgrades: master cloud email, last sync + next sync countdown, Support section (mailto to support.gilnet.property.manager@gmail.com), "Check Cloud Backup" comparing cloud vs local record counts.
+- [ ] Windows app details: product name "Chaniche Lodge", GILNET copyright/author, Help menu with About dialog and Email Support button.
+- [ ] Receipt numbers on restaurant sales.
+- [ ] Google Drive backups (needs each lodge's Google account connected — deferred).
+- [ ] Transfer Property Ownership — risky as specced (cloud records belong to the old account and would be stranded); offer support-email assisted transfer instead.
+- [ ] PINs synced to cloud so they restore on a new computer.
+- Note: user asked for a localStorage rebuild in src/pages/Index.tsx — keeping the existing IndexedDB system (safer, already working) and this TanStack app's structure; intent is preserved.

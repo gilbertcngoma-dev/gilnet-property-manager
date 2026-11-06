@@ -85,6 +85,13 @@
       "when": 1793851537196,
       "tag": "0011_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793934158446,
+      "tag": "0012_create_central_sync",
+      "breakpoints": true
     }
   ]
 }
