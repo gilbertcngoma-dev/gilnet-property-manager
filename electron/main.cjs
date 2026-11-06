@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, shell } = require('electron');
+const { app, BrowserWindow, Menu, dialog, shell } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const APP_URL = 'https://lodgeflow-stay-and-revenue.lovable.app/';
@@ -61,7 +61,43 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(createWindow).catch((error) => {
+function buildMenu() {
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'About Chaniche Lodge',
+          click: () => {
+            dialog.showMessageBox({
+              type: 'info',
+              title: 'About Chaniche Lodge',
+              message: 'Chaniche Lodge - GILNET Property Manager',
+              detail: 'Version 1.0.0\nCompany: GILNET\nSupport: support.gilnet.property.manager@gmail.com',
+              buttons: ['OK', 'Email Support'],
+              defaultId: 0,
+            }).then(({ response }) => {
+              if (response === 1) {
+                shell.openExternal('mailto:support.gilnet.property.manager@gmail.com?subject=' +
+                  encodeURIComponent('[GILNET SUPPORT] Desktop app help')).catch(log);
+              }
+            }).catch(log);
+          },
+        },
+        {
+          label: 'Email Support',
+          click: () => {
+            shell.openExternal('mailto:support.gilnet.property.manager@gmail.com?subject=' +
+              encodeURIComponent('[GILNET SUPPORT] Desktop app help')).catch(log);
+          },
+        },
+      ],
+    },
+  ]);
+  Menu.setApplicationMenu(menu);
+}
+
+app.whenReady().then(() => { buildMenu(); createWindow(); }).catch((error) => {
   log(error);
   dialog.showErrorBox('Chaniche Lodge could not start', error.message);
   app.quit();

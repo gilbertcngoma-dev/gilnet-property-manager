@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      central_sync: {
+        Row: {
+          cash_collected_today: number
+          date: string
+          is_online: boolean
+          last_checkin_name: string | null
+          last_checkin_time: string | null
+          last_sync_at: string
+          property_code: string
+          property_name: string
+          rooms_available: number
+          rooms_occupied: number
+          total_guests_today: number
+          total_sales_today: number
+        }
+        Insert: {
+          cash_collected_today?: number
+          date?: string
+          is_online?: boolean
+          last_checkin_name?: string | null
+          last_checkin_time?: string | null
+          last_sync_at?: string
+          property_code: string
+          property_name?: string
+          rooms_available?: number
+          rooms_occupied?: number
+          total_guests_today?: number
+          total_sales_today?: number
+        }
+        Update: {
+          cash_collected_today?: number
+          date?: string
+          is_online?: boolean
+          last_checkin_name?: string | null
+          last_checkin_time?: string | null
+          last_sync_at?: string
+          property_code?: string
+          property_name?: string
+          rooms_available?: number
+          rooms_occupied?: number
+          total_guests_today?: number
+          total_sales_today?: number
+        }
+        Relationships: []
+      }
       lodge_backups: {
         Row: {
           created_at: string
